@@ -789,34 +789,148 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Filter bar in suggest modal */
+/* Filter bar in suggest modal - Apple/Bauhaus refined */
 .timegrain-filter-bar {
   display: flex;
-  justify-content: flex-end;
-  padding: var(--size-4-1) var(--size-4-2);
-  border-bottom: 1px solid var(--background-modifier-border);
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: transparent;
+  border-bottom: none;
 }
 
-.timegrain-filter-toggle {
-  padding: var(--size-4-1) var(--size-4-2);
-  font-size: var(--font-ui-smaller);
-  background: var(--background-modifier-border);
+.timegrain-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.timegrain-filter-row-split {
+  justify-content: space-between;
+}
+
+.timegrain-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Pill-shaped filter chips */
+.timegrain-filter-chip {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--background-modifier-hover);
   border: none;
-  border-radius: var(--radius-s);
+  border-radius: 100px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.timegrain-filter-toggle:hover {
+.timegrain-filter-chip:hover {
+  background: var(--background-modifier-border);
+  color: var(--text-normal);
+  transform: translateY(-1px);
+}
+
+.timegrain-filter-chip:active {
+  transform: translateY(0);
+}
+
+.timegrain-filter-chip.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Dot separator */
+.timegrain-filter-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* iOS-style toggle */
+.timegrain-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timegrain-toggle {
+  width: 34px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--background-modifier-border);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.timegrain-toggle::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  top: 2px;
+  left: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timegrain-toggle.is-active {
+  background: var(--interactive-accent);
+}
+
+.timegrain-toggle.is-active::after {
+  transform: translateX(14px);
+}
+
+.timegrain-toggle-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Pill-style dropdowns */
+.timegrain-filter-select {
+  appearance: none;
+  padding: 5px 26px 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
   background: var(--background-modifier-hover);
+  border: none;
+  border-radius: 100px;
+  color: var(--text-muted);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timegrain-filter-select:hover {
+  background-color: var(--background-modifier-border);
   color: var(--text-normal);
 }
 
-.timegrain-filter-toggle.is-active {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
+.timegrain-filter-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--interactive-accent);
+}
+
+.timegrain-filter-spacer {
+  flex: 1;
 }
 
 /* ============================================================================

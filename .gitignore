@@ -1,22 +1,28 @@
-# vscode
-.vscode 
+# Dependencies
+node_modules/
 
-# Intellij
-*.iml
-.idea
-
-# npm
-node_modules
-
-# Don't include the compiled main.js file in the repo.
-# They should be uploaded to GitHub releases instead.
+# Build output
 main.js
+*.js.map
 
-# Exclude sourcemaps
-*.map
+# TypeScript
+*.tsbuildinfo
 
-# obsidian
-data.json
+# IDE
+.idea/
+.vscode/
 
-# Exclude macOS Finder (System Explorer) View States
+# OS
 .DS_Store
+Thumbs.db
+
+# Deployment scripts
+deploy.sh
+deploy_to_prod.sh
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
