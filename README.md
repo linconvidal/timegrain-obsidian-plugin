@@ -1,94 +1,101 @@
-# Obsidian Sample Plugin
+# Timegrain
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+*Harvest your time, grain by grain*
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+A Pomodoro timer plugin for [Obsidian](https://obsidian.md) with task tracking, energy logging, and productivity analytics. Port of the [flowtime](https://github.com/your-repo/flowtime) Python TUI.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## Features
 
-## First time developing plugins?
+### Timer
+- Start/pause/resume/stop/complete timer sessions
+- Pomodoro tracking with configurable duration (default 25 min)
+- Audio notification on pomodoro completion
+- Status bar integration
+- Session recovery on startup
 
-Quick starting guide for new plugin devs:
+### Task Management
+- Create tasks with title, status, estimation, energy level, category
+- Plan your day: batch-select tasks to move to "Today"
+- Fuzzy search to quickly find and start tasks
+- Auto-rollover of stale "Today" tasks to "This Week"
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+### Energy Tracking
+- Rate energy level (1-5) after each session
+- Track hour-of-day and day-of-week patterns
+- Analyze peak productivity times
 
-## Releasing new releases
+### Daily Log
+- Interactive calendar with activity heat map
+- Timeline visualization of work sessions
+- Color-coded by task
+- Navigate to any date to review history
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+## Installation
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+### From Obsidian Community Plugins
+*(Coming soon)*
 
-## Adding your plugin to the community plugin list
+### Manual Installation
+1. Download `main.js`, `manifest.json`, `styles.css` from the latest release
+2. Create folder: `<YourVault>/.obsidian/plugins/timegrain/`
+3. Copy the files into that folder
+4. Restart Obsidian
+5. Enable "Timegrain" in Settings → Community plugins
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+## Usage
 
-## How to use
+### Commands
+Access via Command Palette (Ctrl/Cmd + P):
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+| Command | Description |
+|---------|-------------|
+| **Start timer with current note** | Start timing the active file |
+| **Start timer: Select task...** | Fuzzy search to pick a task |
+| **Pause/resume timer** | Toggle timer pause |
+| **Complete timer session** | Finish and log energy level |
+| **Stop timer** | Stop without completing |
+| **Open timer panel** | Show timer in sidebar |
+| **Open daily log** | Calendar + timeline view |
+| **Create new task** | Open task creation form |
+| **Plan your day** | Select tasks for today |
 
-## Manually installing the plugin
+### Data Storage
+- **Tasks**: Markdown files in `*/tasks/*.md` with YAML frontmatter
+- **Sessions**: Stored in `timer_sessions/` folder
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+Compatible with flowtime data format for seamless migration.
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint ./src/`
+## Configuration
 
-## Funding URL
+Settings available in Settings → Timegrain:
 
-You can include funding URLs where people who use your plugin can financially support it.
+- **Timer sessions directory**: Where session files are saved
+- **Default task directory**: Where new tasks are created
+- **Cycle duration**: Pomodoro length in minutes
+- **Daily goal**: Target pomodoros per day
+- **Play sound**: Audio on pomodoro completion
+- **Show status bar**: Timer in status bar
+- **Rollover stale tasks**: Auto-move old "Today" tasks
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+## Development
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
+```bash
+# Install dependencies
+npm install
+
+# Development with watch mode
+npm run dev
+
+# Production build
+npm run build
+
+# Run tests
+npm test
+
+# Deploy to vault
+./deploy.sh
 ```
 
-If you have multiple URLs, you can also do:
+## License
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
+MIT

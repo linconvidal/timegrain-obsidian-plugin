@@ -1,8 +1,1390 @@
-/*
+/* ============================================================================
+   Timegrain Plugin Styles
+   "Harvest your time, grain by grain"
+   ============================================================================ */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* Brand Colors - using Obsidian CSS variables with fallbacks */
+:root {
+  --timegrain-accent: var(--interactive-accent);
+  --timegrain-accent-hover: var(--interactive-accent-hover);
+  --timegrain-success: var(--color-green, #4ade80);
+  --timegrain-warning: var(--color-orange, #fb923c);
+  --timegrain-info: var(--color-blue, #60a5fa);
+  --timegrain-purple: var(--color-purple, #a78bfa);
+}
 
-If your plugin does not need CSS, delete this file.
+/* Timer View Container */
+.timegrain-timer-view {
+  padding: var(--size-4-4);
+}
 
-*/
+.timegrain-timer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-4);
+}
+
+/* Header with Brand */
+.timegrain-timer-header {
+  text-align: center;
+}
+
+.timegrain-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-4-2);
+}
+
+.timegrain-brand-icon {
+  color: var(--timegrain-accent);
+  flex-shrink: 0;
+}
+
+.timegrain-timer-header h4 {
+  margin: 0;
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+}
+
+.timegrain-timer-subtitle {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  margin-top: var(--size-4-1);
+}
+
+/* Grain Stack Visualization */
+.timegrain-grain-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--size-4-3);
+  padding: var(--size-4-4);
+  background: var(--background-secondary);
+  border-radius: var(--radius-m);
+}
+
+.timegrain-grain-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+  justify-content: center;
+  max-width: 220px;
+}
+
+.timegrain-grain-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.timegrain-grain-dot-completed {
+  background: var(--timegrain-accent);
+  border-color: var(--timegrain-accent);
+  box-shadow: 0 0 0 2px var(--background-secondary), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timegrain-grain-dot-current {
+  border-color: var(--timegrain-accent);
+  border-width: 2px;
+  animation: grain-pulse 2s ease-in-out infinite;
+}
+
+.timegrain-grain-dot-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--timegrain-accent);
+  transition: height 0.3s ease;
+}
+
+.timegrain-grain-dot-empty {
+  opacity: 0.4;
+}
+
+.timegrain-grain-progress-text {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  font-weight: var(--font-medium);
+}
+
+@keyframes grain-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--timegrain-accent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+/* Current Task */
+.timegrain-current-task {
+  text-align: center;
+  padding: var(--size-4-2);
+  overflow: hidden;
+}
+
+.timegrain-label {
+  display: block;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-bottom: var(--size-4-1);
+}
+
+.timegrain-task-link {
+  display: inline-block;
+  background: none;
+  border: none;
+  color: var(--text-accent);
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-medium);
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timegrain-task-link:hover {
+  background: var(--background-modifier-hover);
+}
+
+.timegrain-task-link:disabled {
+  color: var(--text-normal);
+  cursor: default;
+}
+
+/* Time Display */
+.timegrain-time-display {
+  text-align: center;
+  padding: var(--size-4-4);
+}
+
+.timegrain-time {
+  font-size: 48px;
+  font-weight: var(--font-bold);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-monospace);
+}
+
+.timegrain-time.timegrain-paused {
+  opacity: 0.5;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.timegrain-pomodoro-count {
+  display: block;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  margin-top: var(--size-4-1);
+}
+
+/* Control Buttons */
+.timegrain-controls {
+  display: flex;
+  gap: var(--size-4-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.timegrain-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  padding: var(--size-4-2) var(--size-4-3);
+  border-radius: var(--radius-s);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-medium);
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.timegrain-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--background-primary), 0 0 0 4px var(--timegrain-accent);
+}
+
+.timegrain-btn:active {
+  transform: scale(0.98);
+}
+
+.timegrain-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.timegrain-btn:disabled:active {
+  transform: none;
+}
+
+.timegrain-btn svg {
+  flex-shrink: 0;
+}
+
+.timegrain-btn-primary {
+  background: var(--timegrain-accent);
+  color: var(--text-on-accent);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.timegrain-btn-primary:hover:not(:disabled) {
+  background: var(--timegrain-accent-hover);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.timegrain-btn-secondary {
+  background: var(--background-modifier-border);
+  color: var(--text-normal);
+}
+
+.timegrain-btn-secondary:hover:not(:disabled) {
+  background: var(--background-modifier-border-hover);
+}
+
+.timegrain-btn-danger {
+  background: var(--background-modifier-error);
+  color: var(--text-on-accent);
+}
+
+.timegrain-btn-danger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.timegrain-btn-full {
+  width: 100%;
+  justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.timegrain-btn-full span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Task Selector */
+.timegrain-task-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-3);
+}
+
+/* Quick Start Button */
+.timegrain-quick-start {
+  display: flex;
+  gap: var(--size-4-2);
+}
+
+.timegrain-start-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-3);
+  padding: var(--size-4-3) var(--size-4-4);
+  background: linear-gradient(135deg, var(--interactive-accent) 0%, var(--interactive-accent-hover) 100%);
+  border: none;
+  border-radius: var(--radius-m);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 0;
+}
+
+.timegrain-start-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.timegrain-start-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.timegrain-start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--background-modifier-border);
+  box-shadow: none;
+}
+
+.timegrain-start-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: var(--text-on-accent);
+  flex-shrink: 0;
+}
+
+.timegrain-start-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.timegrain-start-btn:disabled .timegrain-start-icon {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-muted);
+}
+
+.timegrain-start-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: var(--text-on-accent);
+}
+
+.timegrain-start-btn:disabled .timegrain-start-info {
+  color: var(--text-muted);
+}
+
+.timegrain-start-label {
+  font-size: var(--font-ui-smaller);
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timegrain-start-task {
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.timegrain-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  padding: var(--size-4-2);
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.timegrain-search-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--interactive-accent);
+}
+
+.timegrain-task-list h5 {
+  margin: 0;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  margin-bottom: var(--size-4-2);
+}
+
+.timegrain-search-input {
+  width: 100%;
+  padding: var(--size-4-2);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-primary);
+  font-size: var(--font-ui-small);
+  margin-bottom: var(--size-4-2);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.timegrain-search-input:focus {
+  border-color: var(--timegrain-accent);
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--timegrain-accent) 20%, transparent);
+}
+
+.timegrain-search-input::placeholder {
+  color: var(--text-faint);
+}
+
+.timegrain-task-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.timegrain-task-item {
+  margin-bottom: var(--size-4-1);
+}
+
+.timegrain-task-button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: auto;
+  row-gap: 8px;
+  padding: var(--size-4-2);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.timegrain-task-button:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+
+.timegrain-task-name {
+  font-weight: var(--font-medium);
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timegrain-task-meta {
+  display: flex;
+  gap: var(--size-4-2);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  padding-bottom: 4px;
+}
+
+.timegrain-task-status {
+  text-transform: capitalize;
+}
+
+.timegrain-task-more {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  padding: var(--size-4-2);
+  text-align: center;
+}
+
+.timegrain-empty-state,
+.timegrain-loading {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--size-4-4);
+}
+
+/* Recent Sessions */
+.timegrain-recent-sessions {
+  border-top: 1px solid var(--background-modifier-border);
+  padding-top: var(--size-4-3);
+}
+
+.timegrain-recent-sessions h5 {
+  margin: 0 0 var(--size-4-2) 0;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.timegrain-session-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.timegrain-session-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+  align-items: center;
+  padding: var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: var(--font-ui-smaller);
+}
+
+.timegrain-session-item:last-child {
+  border-bottom: none;
+}
+
+.timegrain-session-time {
+  color: var(--text-faint);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.timegrain-session-time:hover {
+  color: var(--text-muted);
+}
+
+.timegrain-session-task {
+  flex: 1;
+  font-weight: var(--font-medium);
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.timegrain-session-task:hover {
+  color: var(--text-accent);
+}
+
+.timegrain-session-duration {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.timegrain-session-feeling {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.timegrain-effort-ring {
+  flex-shrink: 0;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+}
+
+.timegrain-show-more {
+  display: block;
+  text-align: center;
+  padding: var(--size-4-1);
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  cursor: pointer;
+}
+
+.timegrain-show-more:hover {
+  color: var(--text-muted);
+}
+
+/* Status Bar */
+.timegrain-status {
+  cursor: pointer;
+}
+
+.timegrain-status.timegrain-active {
+  color: var(--interactive-accent);
+}
+
+.timegrain-status.timegrain-paused {
+  opacity: 0.7;
+}
+
+/* Post-Session Modal (Feeling & Effort) */
+.timegrain-energy-modal {
+  text-align: center;
+}
+
+.timegrain-energy-modal h2 {
+  margin-bottom: var(--size-4-4);
+}
+
+.timegrain-section-title {
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+  margin: var(--size-4-4) 0 var(--size-4-2) 0;
+}
+
+.timegrain-feeling-selector {
+  display: flex;
+  gap: var(--size-4-1);
+  justify-content: center;
+  margin-bottom: var(--size-4-2);
+}
+
+.timegrain-feeling-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  border: 2px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 60px;
+  box-sizing: border-box;
+}
+
+.timegrain-feeling-btn:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+
+.timegrain-feeling-btn.selected {
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.timegrain-feeling-emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.timegrain-feeling-label {
+  font-size: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.timegrain-effort-container {
+  margin-bottom: var(--size-4-4);
+}
+
+.timegrain-effort-header {
+  margin-bottom: var(--size-4-2);
+}
+
+.timegrain-effort-value {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+  color: var(--text-normal);
+}
+
+.timegrain-slider-container {
+  padding: 0 var(--size-4-2);
+}
+
+.timegrain-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-bottom: var(--size-4-1);
+}
+
+.timegrain-effort-slider {
+  width: 100%;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--background-modifier-border);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.timegrain-effort-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  cursor: pointer;
+  border: 2px solid var(--background-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.timegrain-effort-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  cursor: pointer;
+  border: 2px solid var(--background-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.timegrain-energy-submit {
+  display: flex;
+  gap: var(--size-4-2);
+  justify-content: center;
+  margin-top: var(--size-4-4);
+}
+
+.timegrain-skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--size-4-2) var(--size-4-3);
+}
+
+.timegrain-skip-btn:hover {
+  color: var(--text-normal);
+}
+
+/* Unfinished Session Modal */
+.timegrain-unfinished-modal {
+  text-align: center;
+}
+
+.timegrain-unfinished-info {
+  margin-bottom: var(--size-4-4);
+}
+
+.timegrain-unfinished-task {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-bold);
+  color: var(--text-accent);
+}
+
+.timegrain-unfinished-time {
+  color: var(--text-muted);
+}
+
+.timegrain-unfinished-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-2);
+}
+
+.timegrain-unfinished-actions button {
+  padding: var(--size-4-2) var(--size-4-4);
+}
+
+/* Task Suggest Modal */
+.timegrain-suggest-item {
+  padding: var(--size-4-1) 0;
+}
+
+.timegrain-suggest-title {
+  font-weight: var(--font-medium);
+}
+
+.timegrain-suggest-path {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.timegrain-suggest-meta {
+  display: flex;
+  gap: var(--size-4-2);
+  align-items: center;
+  margin-top: var(--size-4-1);
+}
+
+.timegrain-suggest-category {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.timegrain-suggest-poms {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Filter bar in suggest modal */
+.timegrain-filter-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--size-4-1) var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.timegrain-filter-toggle {
+  padding: var(--size-4-1) var(--size-4-2);
+  font-size: var(--font-ui-smaller);
+  background: var(--background-modifier-border);
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.timegrain-filter-toggle:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.timegrain-filter-toggle.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* ============================================================================
+   New Task Modal
+   ============================================================================ */
+
+.timegrain-new-task-modal {
+  max-width: 500px;
+}
+
+.timegrain-new-task-modal h2 {
+  margin-bottom: var(--size-4-4);
+}
+
+.timegrain-modal-buttons {
+  display: flex;
+  gap: var(--size-4-2);
+  justify-content: flex-end;
+  margin-top: var(--size-4-4);
+  padding-top: var(--size-4-4);
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+/* ============================================================================
+   Plan Day Modal
+   ============================================================================ */
+
+.timegrain-plan-day-modal {
+  max-width: 600px;
+}
+
+.timegrain-plan-day-modal h2 {
+  margin-bottom: var(--size-4-2);
+}
+
+.timegrain-modal-subtitle {
+  color: var(--text-muted);
+  margin-bottom: var(--size-4-4);
+}
+
+.timegrain-search-container {
+  margin-bottom: var(--size-4-3);
+}
+
+.timegrain-plan-task-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: var(--size-4-4);
+}
+
+.timegrain-plan-task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-4-2);
+  padding: var(--size-4-2);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  margin-bottom: var(--size-4-1);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.timegrain-plan-task-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.timegrain-plan-task-item.selected {
+  background: var(--background-modifier-active-hover);
+  border-color: var(--interactive-accent);
+}
+
+.timegrain-plan-checkbox {
+  margin-top: var(--size-4-1);
+  flex-shrink: 0;
+}
+
+.timegrain-plan-task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.timegrain-plan-task-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  flex-wrap: wrap;
+}
+
+.timegrain-status-badge {
+  font-size: var(--font-ui-smaller);
+  padding: 2px 8px;
+  border-radius: var(--radius-s);
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  text-transform: capitalize;
+  font-weight: var(--font-medium);
+}
+
+.timegrain-status-today {
+  background: var(--timegrain-success);
+  color: var(--text-on-accent);
+}
+
+.timegrain-status-in-progress {
+  background: var(--timegrain-accent);
+  color: var(--text-on-accent);
+}
+
+.timegrain-status-this-week {
+  background: var(--timegrain-info);
+  color: var(--text-on-accent);
+}
+
+.timegrain-status-this-month {
+  background: var(--timegrain-purple);
+  color: var(--text-on-accent);
+}
+
+.timegrain-status-backlog {
+  background: var(--timegrain-warning);
+  color: var(--text-on-accent);
+}
+
+.timegrain-status-not-started {
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.timegrain-plan-task-name {
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timegrain-plan-task-meta {
+  display: flex;
+  gap: var(--size-4-2);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-top: var(--size-4-1);
+}
+
+.timegrain-task-category {
+  background: var(--background-secondary);
+  padding: 2px 6px;
+  border-radius: var(--radius-s);
+}
+
+.timegrain-task-poms {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+   Calendar / Dashboard View
+   ============================================================================ */
+
+.timegrain-dashboard-view {
+  padding: var(--size-4-4);
+}
+
+.timegrain-calendar-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-4);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.timegrain-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timegrain-calendar-header h4 {
+  margin: 0;
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+}
+
+.timegrain-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: var(--size-4-1);
+  line-height: 1;
+}
+
+.timegrain-close-btn:hover {
+  color: var(--text-normal);
+}
+
+.timegrain-calendar-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-4);
+}
+
+/* Mini Calendar */
+.timegrain-mini-calendar {
+  flex: 0 0 auto;
+  width: 260px;
+  background: var(--background-secondary);
+  border-radius: var(--radius-m);
+  padding: var(--size-4-3);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timegrain-calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--size-4-3);
+}
+
+.timegrain-nav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--size-4-1) var(--size-4-2);
+  color: var(--text-muted);
+  font-size: var(--font-ui-medium);
+}
+
+.timegrain-nav-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+  border-radius: var(--radius-s);
+}
+
+.timegrain-month-label {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+  font-size: var(--font-ui-medium);
+  padding: var(--size-4-1) var(--size-4-2);
+}
+
+.timegrain-month-label:hover {
+  background: var(--background-modifier-hover);
+  border-radius: var(--radius-s);
+}
+
+.timegrain-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0 0 var(--size-4-1) 0;
+  padding: 0;
+  gap: 0;
+}
+
+.timegrain-weekday {
+  text-align: center;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  font-weight: var(--font-medium);
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.timegrain-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.timegrain-day-empty,
+.timegrain-day {
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  border-radius: 0 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none;
+}
+
+.timegrain-day-empty {
+  background: transparent;
+}
+
+.timegrain-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  z-index: 0;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+}
+
+.timegrain-day:hover {
+  background: var(--background-modifier-hover);
+}
+
+.timegrain-day:active {
+  background: var(--background-modifier-active-hover);
+}
+
+.timegrain-day:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--interactive-accent);
+}
+
+.timegrain-day.weekend {
+  opacity: 0.7;
+}
+
+.timegrain-day.today {
+  border: 2px solid var(--interactive-accent);
+  font-weight: var(--font-bold);
+}
+
+.timegrain-day.selected {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 2px white;
+  font-weight: var(--font-bold);
+}
+
+.timegrain-day.selected:hover,
+.timegrain-day.selected:active {
+  background: transparent !important;
+}
+
+/* Heat map intensity - using pseudo-element with opacity for compatibility */
+.timegrain-day.intensity-1::before,
+.timegrain-day.intensity-2::before,
+.timegrain-day.intensity-3::before,
+.timegrain-day.intensity-4::before,
+.timegrain-day.intensity-5::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--interactive-accent);
+  border-radius: 0;
+  z-index: -1;
+}
+
+.timegrain-day.intensity-1::before {
+  opacity: 0.15;
+}
+
+.timegrain-day.intensity-2::before {
+  opacity: 0.30;
+}
+
+.timegrain-day.intensity-3::before {
+  opacity: 0.50;
+}
+
+.timegrain-day.intensity-4::before {
+  opacity: 0.70;
+}
+
+.timegrain-day.intensity-5::before {
+  opacity: 0.90;
+}
+
+.timegrain-day.intensity-5 {
+  color: var(--text-on-accent);
+}
+
+/* Selected days keep their heat map intensity, ring shows selection */
+.timegrain-day.selected.intensity-4,
+.timegrain-day.selected.intensity-5 {
+  color: var(--text-on-accent);
+}
+
+/* Day Timeline */
+.timegrain-day-timeline {
+  flex: 1 1 300px;
+  min-width: 0;
+  background: var(--background-secondary);
+  border-radius: var(--radius-m);
+  padding: var(--size-4-3);
+}
+
+.timegrain-timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--size-4-3);
+  padding-bottom: var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.timegrain-date-label {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-ui-medium);
+}
+
+.timegrain-duration-label {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.timegrain-timeline-chart {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: var(--size-4-3);
+}
+
+.timegrain-timeline-hour {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  height: 24px;
+}
+
+.timegrain-hour-label {
+  width: 50px;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.timegrain-hour-bar {
+  flex: 1;
+  height: 100%;
+  background: var(--background-primary);
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.timegrain-hour-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-faint);
+}
+
+.timegrain-session-block {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 0;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.timegrain-session-block.hovered {
+  opacity: 1;
+}
+
+.timegrain-session-block.active {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.6; }
+}
+
+.timegrain-current-time {
+  position: absolute;
+  left: 54px;
+  right: 0;
+  height: 24px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Vertical line at current minute position */
+.timegrain-current-time::before {
+  content: '';
+  position: absolute;
+  left: var(--minute-percent, 0%);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-red, #e53935);
+  transform: translateX(-1px);
+}
+
+/* Small triangle marker at top */
+.timegrain-current-time::after {
+  content: '';
+  position: absolute;
+  left: var(--minute-percent, 0%);
+  top: -4px;
+  transform: translateX(-4px);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--color-red, #e53935);
+}
+
+.timegrain-time-text {
+  position: absolute;
+  left: var(--minute-percent, 0%);
+  top: -18px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--color-red, #e53935);
+  font-weight: var(--font-medium);
+  background: var(--background-secondary);
+  padding: 1px 4px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+/* Timeline Legend */
+.timegrain-timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+  padding-top: var(--size-4-2);
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.timegrain-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  font-size: var(--font-ui-smaller);
+  background: none;
+  border: none;
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.timegrain-legend-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.timegrain-legend-item:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+.timegrain-legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.timegrain-legend-name {
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}

@@ -1,24 +1,33 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "timegrain-obsidian-plugin",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Harvest your time, grain by grain - A Pomodoro timer with task tracking and analytics for Obsidian",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": [],
+	"keywords": ["obsidian", "pomodoro", "timer", "productivity", "task-management"],
 	"author": "",
 	"license": "MIT",
+	"dependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
 	"devDependencies": {
-		"@types/node": "^16.11.6",
+		"@types/node": "^20.0.0",
+		"@types/react": "^18.2.0",
+		"@types/react-dom": "^18.2.0",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
 		"esbuild": "0.17.3",
 		"obsidian": "latest",
 		"tslib": "2.4.0",
-		"typescript": "4.7.4"
+		"typescript": "4.7.4",
+		"vitest": "^1.6.0"
 	}
 }

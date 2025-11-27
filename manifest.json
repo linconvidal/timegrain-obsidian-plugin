@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"id": "timegrain",
+	"name": "Timegrain",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Harvest your time, grain by grain - A Pomodoro timer with task tracking, energy logging, and productivity analytics",
+	"author": "Lincon",
+	"authorUrl": "",
+	"fundingUrl": "",
 	"isDesktopOnly": false
 }
