@@ -3,11 +3,12 @@ import type { Task, TaskStatus } from '../types';
 import { usePlugin } from '../context/PluginContext';
 
 /**
- * Hook for accessing task data
+ * Hook for accessing task data with session stats merged
  */
 export function useTasks(statuses?: TaskStatus[]) {
   const { plugin } = usePlugin();
   const taskRepository = plugin.taskRepository;
+  const sessionRepository = plugin.sessionRepository;
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,18 +19,26 @@ export function useTasks(statuses?: TaskStatus[]) {
   const statusesRef = useRef(statuses);
   statusesRef.current = statuses;
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     try {
       const currentStatuses = statusesRef.current;
       const allTasks = currentStatuses
         ? taskRepository.getTasksByStatuses(currentStatuses)
         : taskRepository.getAllTasks();
-      setTasks(allTasks);
+
+      // Fetch session stats and merge actualPoms into tasks
+      const sessionStats = await sessionRepository.getSessionStatsByTask();
+      const tasksWithPoms = allTasks.map(task => ({
+        ...task,
+        actualPoms: sessionStats[task.name]?.actualPoms || 0,
+      }));
+
+      setTasks(tasksWithPoms);
     } finally {
       setLoading(false);
     }
-  }, [taskRepository, statusKey]);
+  }, [taskRepository, sessionRepository, statusKey]);
 
   useEffect(() => {
     refresh();
@@ -50,26 +59,40 @@ export function useTasks(statuses?: TaskStatus[]) {
 }
 
 /**
- * Hook for getting tasks grouped by status
+ * Hook for getting tasks grouped by status with session stats merged
  */
 export function useTasksByStatus() {
   const { plugin } = usePlugin();
   const taskRepository = plugin.taskRepository;
+  const sessionRepository = plugin.sessionRepository;
 
   const [tasksByStatus, setTasksByStatus] = useState<Record<TaskStatus, Task[]>>(
     {} as Record<TaskStatus, Task[]>
   );
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     try {
       const grouped = taskRepository.getTasksGroupedByStatus();
-      setTasksByStatus(grouped);
+      const sessionStats = await sessionRepository.getSessionStatsByTask();
+
+      // Merge actualPoms into each task
+      const groupedWithPoms = Object.fromEntries(
+        Object.entries(grouped).map(([status, tasks]) => [
+          status,
+          tasks.map(task => ({
+            ...task,
+            actualPoms: sessionStats[task.name]?.actualPoms || 0,
+          })),
+        ])
+      ) as Record<TaskStatus, Task[]>;
+
+      setTasksByStatus(groupedWithPoms);
     } finally {
       setLoading(false);
     }
-  }, [taskRepository]);
+  }, [taskRepository, sessionRepository]);
 
   useEffect(() => {
     refresh();

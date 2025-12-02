@@ -401,90 +401,341 @@
   }
 }
 
+/* Task List Header */
 .timegrain-task-list h5 {
   margin: 0;
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-  margin-bottom: var(--size-4-2);
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-semibold);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--size-4-3);
 }
 
+/* Search Input - refined */
 .timegrain-search-input {
   width: 100%;
-  padding: var(--size-4-2);
+  padding: 10px 12px;
   border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-s);
+  border-radius: var(--radius-m);
   background: var(--background-primary);
   font-size: var(--font-ui-small);
-  margin-bottom: var(--size-4-2);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  margin-bottom: var(--size-4-3);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.timegrain-search-input:hover {
+  border-color: var(--background-modifier-border-hover);
 }
 
 .timegrain-search-input:focus {
   border-color: var(--timegrain-accent);
   outline: none;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--timegrain-accent) 20%, transparent);
+  background: var(--background-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--timegrain-accent) 15%, transparent);
 }
 
 .timegrain-search-input::placeholder {
   color: var(--text-faint);
 }
 
+/* Task Items Container */
 .timegrain-task-items {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 200px;
+  max-height: 280px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 4px;
 }
 
+/* Individual Task Item */
 .timegrain-task-item {
-  margin-bottom: var(--size-4-1);
+  margin: 0;
 }
 
+/* Task Card Button - reset all inherited styles first */
 .timegrain-task-button {
+  all: unset;
+  display: block;
   width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: auto;
-  row-gap: 8px;
-  padding: var(--size-4-2);
+  box-sizing: border-box;
+  padding: 8px 10px 8px 12px;
   border: 1px solid var(--background-modifier-border);
+  border-left: 3px solid var(--background-modifier-border);
   border-radius: var(--radius-s);
   background: var(--background-secondary);
   cursor: pointer;
   text-align: left;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .timegrain-task-button:hover {
-  border-color: var(--interactive-accent);
-  background: var(--background-modifier-hover);
+  border-color: var(--background-modifier-border-hover);
+  background: var(--background-secondary-alt);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+.timegrain-task-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Status-based left border colors */
+.timegrain-task-button[data-status="today"] {
+  border-left-color: var(--timegrain-success);
+}
+
+.timegrain-task-button[data-status="in progress"] {
+  border-left-color: var(--timegrain-accent);
+}
+
+.timegrain-task-button[data-status="this week"] {
+  border-left-color: var(--timegrain-info);
+}
+
+.timegrain-task-button[data-status="this month"] {
+  border-left-color: var(--timegrain-purple);
+}
+
+.timegrain-task-button[data-status="backlog"] {
+  border-left-color: var(--timegrain-warning);
+}
+
+/* Hover state intensifies the accent */
+.timegrain-task-button[data-status="today"]:hover {
+  border-left-color: var(--timegrain-success);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+              -2px 0 8px color-mix(in srgb, var(--timegrain-success) 15%, transparent);
+}
+
+.timegrain-task-button[data-status="in progress"]:hover {
+  border-left-color: var(--timegrain-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+              -2px 0 8px color-mix(in srgb, var(--timegrain-accent) 15%, transparent);
+}
+
+.timegrain-task-button[data-status="this week"]:hover {
+  border-left-color: var(--timegrain-info);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+              -2px 0 8px color-mix(in srgb, var(--timegrain-info) 15%, transparent);
+}
+
+.timegrain-task-button[data-status="this month"]:hover {
+  border-left-color: var(--timegrain-purple);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+              -2px 0 8px color-mix(in srgb, var(--timegrain-purple) 15%, transparent);
+}
+
+.timegrain-task-button[data-status="backlog"]:hover {
+  border-left-color: var(--timegrain-warning);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+              -2px 0 8px color-mix(in srgb, var(--timegrain-warning) 15%, transparent);
+}
+
+/* Task Header Row - name + progress */
+.timegrain-task-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* Task Name - primary text */
 .timegrain-task-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-ui-small);
   font-weight: var(--font-medium);
   color: var(--text-normal);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
+/* Task Meta Row */
 .timegrain-task-meta {
   display: flex;
-  gap: var(--size-4-2);
-  font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
-  padding-bottom: 4px;
+  align-items: center;
+  gap: 4px 6px;
+  flex-wrap: wrap;
+  row-gap: 4px;
 }
 
+/* Status Badge */
 .timegrain-task-status {
-  text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
+/* Status badge colors */
+.timegrain-task-button[data-status="today"] .timegrain-task-status {
+  background: color-mix(in srgb, var(--timegrain-success) 20%, transparent);
+  color: var(--timegrain-success);
+}
+
+.timegrain-task-button[data-status="in progress"] .timegrain-task-status {
+  background: color-mix(in srgb, var(--timegrain-accent) 20%, transparent);
+  color: var(--timegrain-accent);
+}
+
+.timegrain-task-button[data-status="this week"] .timegrain-task-status {
+  background: color-mix(in srgb, var(--timegrain-info) 20%, transparent);
+  color: var(--timegrain-info);
+}
+
+.timegrain-task-button[data-status="this month"] .timegrain-task-status {
+  background: color-mix(in srgb, var(--timegrain-purple) 20%, transparent);
+  color: var(--timegrain-purple);
+}
+
+.timegrain-task-button[data-status="backlog"] .timegrain-task-status {
+  background: color-mix(in srgb, var(--timegrain-warning) 20%, transparent);
+  color: var(--timegrain-warning);
+}
+
+/* Scope Tag */
+.timegrain-task-scope {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: var(--font-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-s);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  white-space: nowrap;
+  border: 1px solid var(--background-modifier-border);
+}
+
+/* Category Tag */
+.timegrain-task-category-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: var(--font-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-s);
+  background: color-mix(in srgb, var(--text-faint) 10%, transparent);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.timegrain-task-category-tag::before {
+  content: '#';
+  margin-right: 1px;
+  opacity: 0.7;
+}
+
+/* Progress Container */
+.timegrain-task-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Progress Bar Track */
+.timegrain-progress-bar {
+  width: 50px;
+  height: 4px;
+  background: var(--background-modifier-border);
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Progress Bar Fill */
+.timegrain-progress-fill {
+  display: block;
+  height: 100%;
+  min-height: 4px;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  background: var(--background-modifier-border-hover);
+}
+
+/* Progress fill colors based on status */
+.timegrain-task-button[data-status="today"] .timegrain-progress-fill {
+  background: var(--timegrain-success);
+}
+
+.timegrain-task-button[data-status="in progress"] .timegrain-progress-fill {
+  background: var(--timegrain-accent);
+}
+
+.timegrain-task-button[data-status="this week"] .timegrain-progress-fill {
+  background: var(--timegrain-info);
+}
+
+.timegrain-task-button[data-status="this month"] .timegrain-progress-fill {
+  background: var(--timegrain-purple);
+}
+
+.timegrain-task-button[data-status="backlog"] .timegrain-progress-fill {
+  background: var(--timegrain-warning);
+}
+
+/* Progress Text */
+.timegrain-task-estimation {
+  font-size: 11px;
+  font-weight: var(--font-medium);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Focus state for accessibility */
+.timegrain-task-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background-primary),
+              0 0 0 4px var(--timegrain-accent);
+}
+
+/* Custom scrollbar for task list */
+.timegrain-task-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.timegrain-task-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timegrain-task-items::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border);
+  border-radius: 3px;
+}
+
+.timegrain-task-items::-webkit-scrollbar-thumb:hover {
+  background: var(--background-modifier-border-hover);
+}
+
+/* "More tasks" indicator */
 .timegrain-task-more {
   font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
-  padding: var(--size-4-2);
+  color: var(--text-faint);
+  padding: var(--size-4-3);
   text-align: center;
+  font-weight: var(--font-medium);
+  border-top: 1px dashed var(--background-modifier-border);
+  margin-top: 4px;
 }
 
 .timegrain-empty-state,

@@ -141,24 +141,47 @@ export function TaskSelector() {
           </p>
         ) : (
           <ul className="timegrain-task-items">
-            {filteredTasks.slice(0, 10).map((task) => (
-              <li key={task.path} className="timegrain-task-item">
-                <button
-                  className="timegrain-task-button"
-                  onClick={() => handleStartWithTask(task)}
-                >
-                  <span className="timegrain-task-name">{task.title || task.name}</span>
-                  <span className="timegrain-task-meta">
-                    <span className="timegrain-task-status">{task.status}</span>
-                    {task.estimation > 0 && (
-                      <span className="timegrain-task-estimation">
-                        {task.actualPoms}/{task.estimation}
-                      </span>
-                    )}
-                  </span>
-                </button>
-              </li>
-            ))}
+            {filteredTasks.slice(0, 10).map((task) => {
+              const progressPercent = task.estimation > 0
+                ? Math.min(100, Math.round((task.actualPoms / task.estimation) * 100))
+                : 0;
+
+              return (
+                <li key={task.path} className="timegrain-task-item">
+                  <button
+                    className="timegrain-task-button"
+                    data-status={task.status?.toLowerCase()}
+                    onClick={() => handleStartWithTask(task)}
+                  >
+                    <div className="timegrain-task-header">
+                      <div className="timegrain-task-name">{task.title || task.name}</div>
+                      {task.estimation > 0 && (
+                        <div className="timegrain-task-progress">
+                          <div className="timegrain-progress-bar">
+                            <div
+                              className="timegrain-progress-fill"
+                              style={{ width: `${progressPercent}%` }}
+                            />
+                          </div>
+                          <span className="timegrain-task-estimation">
+                            {task.actualPoms}/{task.estimation}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="timegrain-task-meta">
+                      <span className="timegrain-task-status">{task.status}</span>
+                      {task.scope && (
+                        <span className="timegrain-task-scope">{task.scope}</span>
+                      )}
+                      {task.category && (
+                        <span className="timegrain-task-category-tag">{task.category}</span>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
             {filteredTasks.length > 10 && (
               <li className="timegrain-task-more">
                 +{filteredTasks.length - 10} more tasks
