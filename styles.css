@@ -999,7 +999,13 @@
   cursor: pointer;
 }
 
-.timegrain-plan-day-modal .suggestion-item.timegrain-plan-item.is-selected {
+/* Disable Obsidian's automatic hover/selection highlighting */
+.timegrain-plan-day-modal .suggestion-item.is-selected {
+  background: transparent;
+}
+
+/* Our checkbox-selected state */
+.timegrain-plan-day-modal .suggestion-item.timegrain-plan-item.is-checked {
   background: hsla(var(--interactive-accent-hsl), 0.15);
 }
 

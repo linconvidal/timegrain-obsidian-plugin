@@ -67,6 +67,14 @@ export class PlanDayModal extends SuggestModal<Task> {
     const resultsContainer = this.modalEl.querySelector('.prompt-results');
     if (!resultsContainer) return;
 
+    // Clean up existing elements (in case of re-open)
+    if (this.filterBarEl) {
+      this.filterBarEl.remove();
+    }
+    if (this.buttonContainer) {
+      this.buttonContainer.remove();
+    }
+
     const refresh = () => {
       // Trigger re-render by dispatching input event
       this.inputEl.dispatchEvent(new Event('input'));
@@ -225,7 +233,15 @@ export class PlanDayModal extends SuggestModal<Task> {
     const isSelected = this.selectedPaths.has(task.path);
 
     el.addClass('timegrain-plan-item');
-    if (isSelected) el.addClass('is-selected');
+    if (isSelected) el.addClass('is-checked');
+
+    // Intercept clicks to prevent SuggestModal from closing
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.toggleTask(task.path);
+      this.inputEl.dispatchEvent(new Event('input'));
+    });
 
     // Checkbox
     const checkbox = el.createEl('input', {
@@ -264,17 +280,9 @@ export class PlanDayModal extends SuggestModal<Task> {
     });
   }
 
-  onChooseSuggestion(task: Task, _evt: MouseEvent | KeyboardEvent): void {
-    // Toggle selection instead of closing
-    this.toggleTask(task.path);
-    // Re-render and keep modal open
-    this.inputEl.dispatchEvent(new Event('input'));
-    // Prevent default close behavior by re-opening
-    setTimeout(() => {
-      if (!this.modalEl.isConnected) {
-        this.open();
-      }
-    }, 0);
+  onChooseSuggestion(_task: Task, _evt: MouseEvent | KeyboardEvent): void {
+    // Click handling is done in renderSuggestion to prevent modal close
+    // This is only called on keyboard Enter - do nothing to prevent close
   }
 
   private toggleTask(path: string): void {
