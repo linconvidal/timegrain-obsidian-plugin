@@ -1,6 +1,15 @@
 import { App, FuzzySuggestModal } from 'obsidian';
 import type TimegrainPlugin from '../main';
 import type { Task, TaskStatus } from '../types';
+import {
+  createChip,
+  createToggle,
+  createSelect,
+  createFilterRow,
+  createFilterGroup,
+  createDotSeparator,
+  createSpacer,
+} from '../utils/filter-utils';
 
 /** Filter state for task suggest modal */
 interface FilterState {
@@ -102,84 +111,13 @@ export class TaskSuggestModal extends FuzzySuggestModal<Task> {
     this.inputEl.dispatchEvent(new Event('input'));
   }
 
-  private createChip(
-    parent: HTMLElement,
-    label: string,
-    isActive: () => boolean,
-    onClick: () => void
-  ): HTMLButtonElement {
-    const chip = parent.createEl('button', {
-      text: label,
-      cls: 'timegrain-filter-chip',
-    });
-    if (isActive()) chip.classList.add('is-active');
-
-    chip.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onClick();
-      chip.classList.toggle('is-active', isActive());
-      this.refreshResults();
-    });
-
-    return chip;
-  }
-
-  private createToggle(
-    parent: HTMLElement,
-    label: string,
-    isActive: () => boolean,
-    onClick: () => void
-  ): HTMLElement {
-    const wrapper = parent.createEl('div', { cls: 'timegrain-toggle-wrapper' });
-
-    const toggle = wrapper.createEl('button', { cls: 'timegrain-toggle' });
-    if (isActive()) toggle.classList.add('is-active');
-
-    wrapper.createEl('span', { text: label, cls: 'timegrain-toggle-label' });
-
-    toggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onClick();
-      toggle.classList.toggle('is-active', isActive());
-      this.refreshResults();
-    });
-
-    return wrapper;
-  }
-
-  private createSelect(
-    parent: HTMLElement,
-    placeholder: string,
-    options: string[],
-    selected: Set<string>,
-    onChange: (value: string) => void
-  ): HTMLSelectElement {
-    const select = parent.createEl('select', { cls: 'timegrain-filter-select' });
-    select.createEl('option', { text: placeholder, value: '' });
-
-    for (const opt of options) {
-      if (opt) {
-        const option = select.createEl('option', { text: opt, value: opt });
-        if (selected.has(opt)) option.selected = true;
-      }
-    }
-
-    select.addEventListener('change', (e) => {
-      e.stopPropagation();
-      onChange(select.value);
-      this.refreshResults();
-    });
-
-    return select;
-  }
-
   onOpen(): void {
     super.onOpen();
 
     const resultsContainer = this.modalEl.querySelector('.prompt-results');
     if (!resultsContainer) return;
+
+    const refresh = () => this.refreshResults();
 
     // Create filter bar
     this.filterBarEl = document.createElement('div');
@@ -187,11 +125,11 @@ export class TaskSuggestModal extends FuzzySuggestModal<Task> {
     resultsContainer.insertAdjacentElement('beforebegin', this.filterBarEl);
 
     // Row 1: Status chips + toggle
-    const row1 = this.filterBarEl.createEl('div', { cls: 'timegrain-filter-row timegrain-filter-row-split' });
+    const row1 = createFilterRow(this.filterBarEl, true);
+    const statusGroup = createFilterGroup(row1);
 
-    const statusGroup = row1.createEl('div', { cls: 'timegrain-filter-group' });
     for (const status of STATUS_CHIPS) {
-      this.createChip(
+      createChip(
         statusGroup,
         status,
         () => this.filters.statuses.has(status),
@@ -201,88 +139,94 @@ export class TaskSuggestModal extends FuzzySuggestModal<Task> {
           } else {
             this.filters.statuses.add(status);
           }
-        }
+        },
+        refresh
       );
     }
 
     // Toggle for completed
-    this.createToggle(
+    createToggle(
       row1,
       'completed',
       () => this.filters.showAll,
       () => {
         this.filters.showAll = !this.filters.showAll;
-      }
+      },
+      refresh
     );
 
     // Row 2: Size + special filters + dropdowns
-    const row2 = this.filterBarEl.createEl('div', { cls: 'timegrain-filter-row' });
+    const row2 = createFilterRow(this.filterBarEl);
 
     // Size chips
     let quickChip: HTMLButtonElement;
     let deepChip: HTMLButtonElement;
 
-    quickChip = this.createChip(
+    quickChip = createChip(
       row2,
       `≤${QUICK_TASK_THRESHOLD}`,
       () => this.filters.sizeFilter === 'quick',
       () => {
         this.filters.sizeFilter = this.filters.sizeFilter === 'quick' ? 'all' : 'quick';
         deepChip.classList.remove('is-active');
-      }
+      },
+      refresh
     );
 
-    deepChip = this.createChip(
+    deepChip = createChip(
       row2,
       `>${QUICK_TASK_THRESHOLD}`,
       () => this.filters.sizeFilter === 'deep',
       () => {
         this.filters.sizeFilter = this.filters.sizeFilter === 'deep' ? 'all' : 'deep';
         quickChip.classList.remove('is-active');
-      }
+      },
+      refresh
     );
 
     // Dot separator
-    row2.createEl('span', { cls: 'timegrain-filter-dot' });
+    createDotSeparator(row2);
 
     // Special filters
-    this.createChip(
+    createChip(
       row2,
       'over budget',
       () => this.filters.needsAttention,
       () => {
         this.filters.needsAttention = !this.filters.needsAttention;
-      }
+      },
+      refresh
     );
 
-    this.createChip(
+    createChip(
       row2,
       'fresh',
       () => this.filters.freshOnly,
       () => {
         this.filters.freshOnly = !this.filters.freshOnly;
-      }
+      },
+      refresh
     );
 
     // Spacer
-    row2.createEl('div', { cls: 'timegrain-filter-spacer' });
+    createSpacer(row2);
 
     // Dropdowns
     const areas = [...new Set(this.allTasks.map((t) => t.area))].filter(Boolean).sort();
     const categories = [...new Set(this.allTasks.map((t) => t.category))].filter(Boolean).sort();
 
     if (areas.length > 0) {
-      this.createSelect(row2, 'Area', areas, this.filters.areas, (value) => {
+      createSelect(row2, 'Area', areas, this.filters.areas, (value) => {
         this.filters.areas.clear();
         if (value) this.filters.areas.add(value);
-      });
+      }, refresh);
     }
 
     if (categories.length > 0) {
-      this.createSelect(row2, 'Category', categories, this.filters.categories, (value) => {
+      createSelect(row2, 'Category', categories, this.filters.categories, (value) => {
         this.filters.categories.clear();
         if (value) this.filters.categories.add(value);
-      });
+      }, refresh);
     }
   }
 

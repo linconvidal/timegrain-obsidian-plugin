@@ -295,7 +295,7 @@
   display: flex;
   align-items: center;
   gap: var(--size-4-3);
-  padding: var(--size-4-3) var(--size-4-4);
+  padding: 10px 16px;
   background: linear-gradient(135deg, var(--interactive-accent) 0%, var(--interactive-accent-hover) 100%);
   border: none;
   border-radius: var(--radius-m);
@@ -334,8 +334,8 @@
 }
 
 .timegrain-start-icon svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 .timegrain-start-btn:disabled .timegrain-start-icon {
@@ -343,41 +343,32 @@
   color: var(--text-muted);
 }
 
-.timegrain-start-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
-  flex: 1;
-  overflow: hidden;
-  color: var(--text-on-accent);
-}
-
-.timegrain-start-btn:disabled .timegrain-start-info {
-  color: var(--text-muted);
-}
-
-.timegrain-start-label {
-  font-size: var(--font-ui-smaller);
-  opacity: 0.85;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
 .timegrain-start-task {
+  flex: 1;
+  min-width: 0;
   font-size: var(--font-ui-medium);
   font-weight: var(--font-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  color: var(--text-on-accent);
 }
 
-.timegrain-search-btn {
+.timegrain-start-btn:disabled .timegrain-start-task {
+  color: var(--text-muted);
+}
+
+/* Action buttons row */
+.timegrain-action-bar {
+  display: flex;
+  gap: var(--size-4-2);
+}
+
+.timegrain-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
+  flex: 1;
   padding: var(--size-4-2);
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
@@ -385,12 +376,29 @@
   cursor: pointer;
   color: var(--text-muted);
   transition: all 0.15s ease;
+  gap: var(--size-4-1);
 }
 
-.timegrain-search-btn:hover {
+.timegrain-action-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
   border-color: var(--interactive-accent);
+}
+
+.timegrain-action-btn svg {
+  flex-shrink: 0;
+}
+
+.timegrain-action-label {
+  font-size: var(--font-ui-smaller);
+  white-space: nowrap;
+}
+
+/* Hide labels on narrow sidebars */
+@media (max-width: 280px) {
+  .timegrain-action-label {
+    display: none;
+  }
 }
 
 .timegrain-task-list h5 {
@@ -937,12 +945,32 @@
    New Task Modal
    ============================================================================ */
 
-.timegrain-new-task-modal {
+/* New Task Modal - uses prompt structure for consistent close button */
+.modal.prompt.timegrain-new-task-modal {
   max-width: 500px;
+  padding: 0;
 }
 
-.timegrain-new-task-modal h2 {
-  margin-bottom: var(--size-4-4);
+/* Modal's close button needs circular styling to match SuggestModal */
+.modal.prompt.timegrain-new-task-modal > .modal-close-button {
+  background: var(--background-secondary-alt);
+  border-radius: var(--radius-m);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 8px;
+  right: 8px;
+}
+
+.timegrain-form-container {
+  padding: 20px;
+  padding-bottom: 10px;
+}
+
+.timegrain-form-container h2 {
+  margin: 0 0 var(--size-4-4) 0;
 }
 
 
@@ -950,74 +978,34 @@
   display: flex;
   gap: var(--size-4-2);
   justify-content: flex-end;
-  margin-top: var(--size-4-4);
-  padding-top: var(--size-4-4);
-  border-top: 1px solid var(--background-modifier-border);
+  padding: 10px 20px 20px 20px;
 }
 
 /* ============================================================================
    Plan Day Modal
    ============================================================================ */
 
-.timegrain-plan-day-modal {
-  max-width: 600px;
+/* Plan Day Modal - uses native Obsidian prompt styling */
+.modal.prompt.timegrain-plan-day-modal {
+  width: 700px;
+  max-width: 90vw;
 }
 
-.timegrain-plan-day-modal h2 {
-  margin-bottom: var(--size-4-2);
-}
-
-.timegrain-modal-subtitle {
-  color: var(--text-muted);
-  margin-bottom: var(--size-4-4);
-}
-
-.timegrain-search-container {
-  margin-bottom: var(--size-4-3);
-}
-
-.timegrain-plan-task-list {
-  max-height: 400px;
-  overflow-y: auto;
-  margin-bottom: var(--size-4-4);
-}
-
-.timegrain-plan-task-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--size-4-2);
-  padding: var(--size-4-2);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: var(--radius-s);
-  margin-bottom: var(--size-4-1);
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.timegrain-plan-task-item:hover {
-  background: var(--background-modifier-hover);
-}
-
-.timegrain-plan-task-item.selected {
-  background: var(--background-modifier-active-hover);
-  border-color: var(--interactive-accent);
-}
-
-.timegrain-plan-checkbox {
-  margin-top: var(--size-4-1);
-  flex-shrink: 0;
-}
-
-.timegrain-plan-task-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.timegrain-plan-task-row {
+/* Plan item - extends native suggestion-item */
+.timegrain-plan-day-modal .suggestion-item.timegrain-plan-item {
   display: flex;
   align-items: center;
-  gap: var(--size-4-2);
-  flex-wrap: wrap;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.timegrain-plan-day-modal .suggestion-item.timegrain-plan-item.is-selected {
+  background: hsla(var(--interactive-accent-hsl), 0.15);
+}
+
+.timegrain-plan-day-modal .suggestion-item .task-list-item-checkbox {
+  flex-shrink: 0;
+  margin: 0;
 }
 
 .timegrain-status-badge {

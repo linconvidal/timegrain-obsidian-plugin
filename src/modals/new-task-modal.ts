@@ -21,6 +21,7 @@ const ENERGY_OPTIONS: { value: number; label: string }[] = [
 
 /**
  * Modal for creating a new task
+ * Uses prompt structure for consistent close button styling
  */
 export class NewTaskModal extends Modal {
   private title = '';
@@ -32,6 +33,7 @@ export class NewTaskModal extends Modal {
   private tags = '';
   private metadataOptions = { categories: [] as string[], scopes: [] as string[], tags: [] as string[] };
   private datalistIdCounter = 0;
+  private formContainer: HTMLElement | null = null;
 
   constructor(
     app: App,
@@ -41,15 +43,28 @@ export class NewTaskModal extends Modal {
   }
 
   onOpen(): void {
-    const { contentEl } = this;
-    contentEl.empty();
-    contentEl.addClass('timegrain-new-task-modal');
+    const { modalEl, contentEl } = this;
+
+    // Use prompt structure for consistent close button (like SuggestModal)
+    contentEl.hide();
+    modalEl.addClass('prompt');
+    modalEl.addClass('timegrain-new-task-modal');
+
     this.refreshMetadataOptions();
 
-    contentEl.createEl('h2', { text: 'Create New Task' });
+    // Create form container (insert before close button)
+    const closeButton = modalEl.querySelector('.modal-close-button');
+    this.formContainer = createDiv('timegrain-form-container');
+    if (closeButton) {
+      modalEl.insertBefore(this.formContainer, closeButton);
+    } else {
+      modalEl.appendChild(this.formContainer);
+    }
+
+    this.formContainer.createEl('h2', { text: 'Create New Task' });
 
     // Task title
-    new Setting(contentEl)
+    new Setting(this.formContainer)
       .setName('Task title')
       .setDesc('The name of your task')
       .addText((text) => {
@@ -69,7 +84,7 @@ export class NewTaskModal extends Modal {
       });
 
     // Status dropdown
-    new Setting(contentEl)
+    new Setting(this.formContainer)
       .setName('Status')
       .setDesc('Initial status for the task')
       .addDropdown((dropdown) => {
@@ -83,7 +98,7 @@ export class NewTaskModal extends Modal {
       });
 
     // Estimation
-    new Setting(contentEl)
+    new Setting(this.formContainer)
       .setName('Estimation')
       .setDesc('Estimated pomodoros to complete')
       .addText((text) => {
@@ -100,7 +115,7 @@ export class NewTaskModal extends Modal {
       });
 
     // Expected energy
-    new Setting(contentEl)
+    new Setting(this.formContainer)
       .setName('Expected energy')
       .setDesc('Energy level needed for this task')
       .addDropdown((dropdown) => {
@@ -114,7 +129,7 @@ export class NewTaskModal extends Modal {
       });
 
     // Category
-    new Setting(contentEl)
+    new Setting(this.formContainer)
       .setName('Category')
       .setDesc('Type to see suggestions from your vault')
       .addText((text) => {
@@ -128,7 +143,7 @@ export class NewTaskModal extends Modal {
       });
 
     // Scope
-    new Setting(contentEl)
+    new Setting(this.formContainer)
       .setName('Scope')
       .setDesc('Type to see suggestions from your vault')
       .addText((text) => {
@@ -142,7 +157,7 @@ export class NewTaskModal extends Modal {
       });
 
     // Tags
-    new Setting(contentEl)
+    new Setting(this.formContainer)
       .setName('Tags')
       .setDesc('Comma-separated, type to see suggestions')
       .addText((text) => {
@@ -156,7 +171,7 @@ export class NewTaskModal extends Modal {
       });
 
     // Buttons
-    const buttonContainer = contentEl.createDiv('timegrain-modal-buttons');
+    const buttonContainer = this.formContainer.createDiv('timegrain-modal-buttons');
 
     const cancelBtn = buttonContainer.createEl('button', {
       text: 'Cancel',
@@ -176,10 +191,10 @@ export class NewTaskModal extends Modal {
   }
 
   private attachAutocomplete(text: TextComponent, options: string[]): void {
-    if (options.length === 0) return;
+    if (options.length === 0 || !this.formContainer) return;
 
     const datalistId = `timegrain-meta-${this.datalistIdCounter++}`;
-    const datalist = this.contentEl.createEl('datalist', { attr: { id: datalistId } });
+    const datalist = this.formContainer.createEl('datalist', { attr: { id: datalistId } });
 
     options.forEach((option) => {
       datalist.createEl('option', { attr: { value: option } });
@@ -387,7 +402,8 @@ views:
   }
 
   onClose(): void {
-    const { contentEl } = this;
-    contentEl.empty();
+    if (this.formContainer) {
+      this.formContainer.remove();
+    }
   }
 }
