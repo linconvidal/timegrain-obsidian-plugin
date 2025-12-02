@@ -22,7 +22,7 @@ export function useTimer() {
     timerService.on('timer-pause', updateStatus);
     timerService.on('timer-resume', updateStatus);
     timerService.on('timer-complete', updateStatus);
-    timerService.on('timer-stop', updateStatus);
+    timerService.on('timer-cancel', updateStatus);
 
     return () => {
       timerService.off('timer-tick', updateStatus);
@@ -30,7 +30,7 @@ export function useTimer() {
       timerService.off('timer-pause', updateStatus);
       timerService.off('timer-resume', updateStatus);
       timerService.off('timer-complete', updateStatus);
-      timerService.off('timer-stop', updateStatus);
+      timerService.off('timer-cancel', updateStatus);
     };
   }, [timerService]);
 
@@ -41,24 +41,24 @@ export function useTimer() {
     [timerService]
   );
 
-  const pause = useCallback(() => {
-    timerService.pause();
+  const pause = useCallback(async () => {
+    return await timerService.pause();
   }, [timerService]);
 
-  const resume = useCallback(() => {
-    timerService.resume();
+  const resume = useCallback(async () => {
+    await timerService.resume();
   }, [timerService]);
 
-  const togglePause = useCallback(() => {
-    timerService.togglePause();
+  const togglePause = useCallback(async () => {
+    await timerService.togglePause();
   }, [timerService]);
 
   const complete = useCallback(async () => {
     return await timerService.complete();
   }, [timerService]);
 
-  const stop = useCallback(async () => {
-    return await timerService.stop();
+  const cancel = useCallback(async () => {
+    await timerService.cancel();
   }, [timerService]);
 
   return {
@@ -76,6 +76,6 @@ export function useTimer() {
     resume,
     togglePause,
     complete,
-    stop,
+    cancel,
   };
 }

@@ -8,7 +8,7 @@ export interface TimerEvents {
   'timer-pause': undefined;
   'timer-resume': undefined;
   'timer-complete': { action: SessionAction; sessionFile: TFile };
-  'timer-stop': undefined;
+  'timer-cancel': undefined;
   'timer-tick': TimerStatus;
   'pomodoro-complete': { count: number };
 }
@@ -22,8 +22,7 @@ export class TimerService extends Events {
   private taskPath: string | null = null;
   private sessionFile: TFile | null = null;
   private startTime: number | null = null;
-  private pausedAt: number | null = null;
-  private totalPausedMs = 0;
+  private accumulatedMs = 0; // Time from previous sessions in this work block
   private currentPomodoro = 0;
   private lastPomodoroNotified = 0;
   private pomodoroDurationMs: number;
@@ -64,21 +63,24 @@ export class TimerService extends Events {
       taskPath: this.taskPath,
       sessionFilePath: this.sessionFile?.path || null,
       startTime: this.startTime,
-      pausedAt: this.pausedAt,
-      totalPausedMs: this.totalPausedMs,
+      accumulatedMs: this.accumulatedMs,
       elapsedSeconds: this.getElapsedSeconds(),
       currentPomodoro: this.currentPomodoro,
     };
   }
 
   getElapsedMs(): number {
-    if (!this.startTime) return 0;
-
-    if (this.pausedAt) {
-      return this.pausedAt - this.startTime - this.totalPausedMs;
+    // When paused: only accumulated time (no active session)
+    if (this.state === 'paused') {
+      return this.accumulatedMs;
     }
 
-    return Date.now() - this.startTime - this.totalPausedMs;
+    // When running: accumulated + current session
+    if (this.startTime) {
+      return this.accumulatedMs + (Date.now() - this.startTime);
+    }
+
+    return this.accumulatedMs;
   }
 
   getElapsedSeconds(): number {
@@ -110,8 +112,7 @@ export class TimerService extends Events {
     this.taskName = taskName;
     this.taskPath = taskPath;
     this.startTime = startTime.getTime();
-    this.pausedAt = null;
-    this.totalPausedMs = 0;
+    this.accumulatedMs = 0;
     this.currentPomodoro = 1;
     this.lastPomodoroNotified = 0;
 
@@ -119,33 +120,48 @@ export class TimerService extends Events {
   }
 
   /**
-   * Pause the timer
+   * Pause the timer - completes current session
    */
-  pause(): void {
+  async pause(): Promise<TFile | null> {
     if (this.state !== 'running') {
       throw new Error('Timer is not running');
     }
 
+    // Save current session time to accumulated
+    if (this.startTime) {
+      this.accumulatedMs += Date.now() - this.startTime;
+    }
+
+    // Complete the current session with action 'pause'
+    const sessionFile = this.sessionFile;
+    if (sessionFile && this.startTime) {
+      try {
+        await this.sessionRepository.completeSession(sessionFile, 'pause', new Date(this.startTime));
+      } catch (e) {
+        console.error('Failed to save session on pause:', e);
+      }
+    }
+
     this.state = 'paused';
-    this.pausedAt = Date.now();
+    this.sessionFile = null;
+    this.startTime = null;
 
     this.trigger('timer-pause');
+    return sessionFile;
   }
 
   /**
-   * Resume the timer
+   * Resume the timer - creates a new session
    */
-  resume(): void {
+  async resume(): Promise<void> {
     if (this.state !== 'paused') {
       throw new Error('Timer is not paused');
     }
 
-    if (this.pausedAt) {
-      this.totalPausedMs += Date.now() - this.pausedAt;
-    }
-
+    // Create new session file
+    this.sessionFile = await this.sessionRepository.createSession(this.taskName!, new Date());
+    this.startTime = Date.now();
     this.state = 'running';
-    this.pausedAt = null;
 
     this.trigger('timer-resume');
   }
@@ -153,11 +169,11 @@ export class TimerService extends Events {
   /**
    * Toggle pause/resume
    */
-  togglePause(): void {
+  async togglePause(): Promise<void> {
     if (this.state === 'running') {
-      this.pause();
+      await this.pause();
     } else if (this.state === 'paused') {
-      this.resume();
+      await this.resume();
     }
   }
 
@@ -188,29 +204,27 @@ export class TimerService extends Events {
   }
 
   /**
-   * Stop the session without completing
+   * Cancel the session - discard without logging
    */
-  async stop(): Promise<TFile | null> {
+  async cancel(): Promise<void> {
     if (this.state !== 'running' && this.state !== 'paused') {
-      return null;
+      return;
     }
 
     const sessionFile = this.sessionFile;
-    const startTime = this.startTime;
 
-    // Reset state first to ensure UI updates even if save fails
+    // Reset state first
     this.reset();
 
-    if (sessionFile && startTime) {
+    // Delete the session file - we're discarding this session
+    if (sessionFile) {
       try {
-        await this.sessionRepository.completeSession(sessionFile, 'stop', new Date(startTime));
+        await this.sessionRepository.deleteSession(sessionFile);
       } catch (e) {
-        console.error('Failed to save session on stop:', e);
+        console.error('Failed to delete session file on cancel:', e);
       }
-      this.trigger('timer-stop');
+      this.trigger('timer-cancel');
     }
-
-    return sessionFile;
   }
 
   /**
@@ -222,8 +236,7 @@ export class TimerService extends Events {
     this.taskPath = null;
     this.sessionFile = null;
     this.startTime = null;
-    this.pausedAt = null;
-    this.totalPausedMs = 0;
+    this.accumulatedMs = 0;
     this.currentPomodoro = 0;
     this.lastPomodoroNotified = 0;
   }
@@ -278,14 +291,13 @@ export class TimerService extends Events {
     // Mark session as resumed
     await this.sessionRepository.markSessionResumed(sessionFile);
 
-    // Restore state
+    // Restore state (crash recovery - continue existing session)
     this.state = 'running';
     this.taskName = taskName;
     this.taskPath = taskPath;
     this.sessionFile = sessionFile;
     this.startTime = startTime.getTime();
-    this.pausedAt = null;
-    this.totalPausedMs = 0;
+    this.accumulatedMs = 0; // Crash recovery starts fresh for this session
     this.currentPomodoro = this.getCurrentPomodoro();
     this.lastPomodoroNotified = this.currentPomodoro - 1;
 
@@ -308,21 +320,21 @@ export class TimerService extends Events {
    */
   getPersistedState(): {
     isActive: boolean;
+    state: TimerState;
     taskName: string | null;
     taskPath: string | null;
     sessionFilePath: string | null;
     startTime: number | null;
-    pausedAt: number | null;
-    totalPausedMs: number;
+    accumulatedMs: number;
   } {
     return {
       isActive: this.state !== 'idle',
+      state: this.state,
       taskName: this.taskName,
       taskPath: this.taskPath,
       sessionFilePath: this.sessionFile?.path || null,
       startTime: this.startTime,
-      pausedAt: this.pausedAt,
-      totalPausedMs: this.totalPausedMs,
+      accumulatedMs: this.accumulatedMs,
     };
   }
 }

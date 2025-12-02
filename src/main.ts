@@ -177,14 +177,14 @@ export default class TimegrainPlugin extends Plugin {
       },
     });
 
-    // Stop timer
+    // Cancel timer
     this.addCommand({
-      id: 'stop-timer',
-      name: 'Stop timer',
+      id: 'cancel-timer',
+      name: 'Cancel timer',
       checkCallback: (checking) => {
         if (this.timerService.isIdle()) return false;
         if (!checking) {
-          this.stopTimerWithEnergyModal();
+          this.timerService.cancel();
         }
         return true;
       },
@@ -290,12 +290,6 @@ export default class TimegrainPlugin extends Plugin {
     }
   }
 
-  private async stopTimerWithEnergyModal(): Promise<void> {
-    const sessionFile = await this.timerService.stop();
-    if (sessionFile) {
-      this.showEnergyModal(sessionFile);
-    }
-  }
 
   // ============================================================================
   // Status Bar

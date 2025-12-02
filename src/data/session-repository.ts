@@ -130,6 +130,13 @@ export class SessionRepository {
   }
 
   /**
+   * Delete a session file (for cancel)
+   */
+  async deleteSession(sessionFile: TFile): Promise<void> {
+    await this.app.vault.delete(sessionFile);
+  }
+
+  /**
    * Get all session files
    */
   getSessionFiles(): TFile[] {

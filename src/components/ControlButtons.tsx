@@ -2,10 +2,10 @@ import { useTimer } from '../hooks/useTimer';
 import { usePlugin } from '../context/PluginContext';
 
 /**
- * Timer control buttons: Start, Pause/Resume, Complete, Stop
+ * Timer control buttons: Pause/Resume, Complete, Cancel
  */
 export function ControlButtons() {
-  const { isRunning, isPaused, isIdle, togglePause, complete, stop } = useTimer();
+  const { isRunning, isPaused, isIdle, togglePause, complete, cancel } = useTimer();
   const { plugin } = usePlugin();
 
   const handleComplete = async () => {
@@ -16,12 +16,9 @@ export function ControlButtons() {
     }
   };
 
-  const handleStop = async () => {
-    const sessionFile = await stop();
-    if (sessionFile) {
-      // Show energy modal for stop too
-      plugin.showEnergyModal(sessionFile);
-    }
+  const handleCancel = async () => {
+    await cancel();
+    // No energy modal - session is discarded
   };
 
   if (isIdle) {
@@ -59,14 +56,14 @@ export function ControlButtons() {
         <span>Complete</span>
       </button>
 
-      {/* Stop button */}
+      {/* Cancel button */}
       <button
         className="timegrain-btn timegrain-btn-danger"
-        onClick={handleStop}
-        aria-label="Stop session"
+        onClick={handleCancel}
+        aria-label="Cancel session"
       >
-        <StopIcon />
-        <span>Stop</span>
+        <CancelIcon />
+        <span>Cancel</span>
       </button>
     </div>
   );
@@ -98,10 +95,11 @@ function CheckIcon() {
   );
 }
 
-function StopIcon() {
+function CancelIcon() {
   return (
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-      <rect x="4" y="4" width="16" height="16" rx="2" />
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
 }

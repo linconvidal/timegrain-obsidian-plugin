@@ -11,6 +11,12 @@
   --timegrain-warning: var(--color-orange, #fb923c);
   --timegrain-info: var(--color-blue, #60a5fa);
   --timegrain-purple: var(--color-purple, #a78bfa);
+
+  /* Wheat grain colors - warm amber harvest tones */
+  --timegrain-grain-light: #f6d365;
+  --timegrain-grain-mid: #d4a024;
+  --timegrain-grain-dark: #92661a;
+  --timegrain-grain-empty: var(--background-modifier-border);
 }
 
 /* Timer View Container */
@@ -37,7 +43,7 @@
 }
 
 .timegrain-brand-icon {
-  color: var(--timegrain-accent);
+  color: #d4a855;
   flex-shrink: 0;
 }
 
@@ -47,80 +53,229 @@
   font-weight: var(--font-semibold);
 }
 
-.timegrain-timer-subtitle {
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-  margin-top: var(--size-4-1);
+/* Progress dots row */
+.timegrain-progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: var(--size-4-2);
 }
 
-/* Grain Stack Visualization */
+.timegrain-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--background-modifier-border);
+  transition: all 0.2s ease;
+}
+
+.timegrain-progress-dot.completed {
+  background: linear-gradient(135deg, #f7e5a0, #d4a855);
+  box-shadow: 0 0 4px rgba(212, 168, 85, 0.4);
+}
+
+/* Hourglass Visualization */
 .timegrain-grain-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--size-4-3);
-  padding: var(--size-4-4);
-  background: var(--background-secondary);
-  border-radius: var(--radius-m);
-}
-
-.timegrain-grain-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--size-4-2);
-  justify-content: center;
-  max-width: 220px;
-}
-
-.timegrain-grain-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid var(--background-modifier-border);
-  background: var(--background-primary);
+  padding: var(--size-4-2) var(--size-4-4);
   position: relative;
-  overflow: hidden;
-  transition: all 0.2s ease;
 }
 
-.timegrain-grain-dot-completed {
-  background: var(--timegrain-accent);
-  border-color: var(--timegrain-accent);
-  box-shadow: 0 0 0 2px var(--background-secondary), 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.timegrain-grain-dot-current {
-  border-color: var(--timegrain-accent);
-  border-width: 2px;
-  animation: grain-pulse 2s ease-in-out infinite;
-}
-
-.timegrain-grain-dot-fill {
+/* Hover tooltip */
+.timegrain-hourglass-tooltip {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--timegrain-accent);
-  transition: height 0.3s ease;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: var(--size-4-3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 10;
+  pointer-events: none;
+  min-width: 140px;
+  text-align: center;
 }
 
-.timegrain-grain-dot-empty {
-  opacity: 0.4;
+.timegrain-grain-stack:hover .timegrain-hourglass-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
 }
 
-.timegrain-grain-progress-text {
+.timegrain-grain-stack:hover .timegrain-hourglass {
+  opacity: 0.15;
+}
+
+.timegrain-tooltip-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--size-4-1);
+  margin-bottom: var(--size-4-2);
+}
+
+.timegrain-tooltip-value {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+  color: var(--text-normal);
+}
+
+.timegrain-tooltip-label {
   font-size: var(--font-ui-small);
   color: var(--text-muted);
-  font-weight: var(--font-medium);
 }
 
-@keyframes grain-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 var(--timegrain-accent);
+.timegrain-tooltip-progress {
+  height: 4px;
+  background: var(--background-modifier-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: var(--size-4-2);
+}
+
+.timegrain-tooltip-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e8c46c, #d4a855);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.timegrain-tooltip-detail {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.timegrain-hourglass {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+  transition: filter 0.3s ease, opacity 0.2s ease;
+}
+
+.timegrain-hourglass-active {
+  filter: drop-shadow(0 2px 8px rgba(212, 168, 85, 0.25));
+}
+
+.timegrain-glass-outline {
+  opacity: 0.7;
+}
+
+/* Sand fills */
+.timegrain-sand-top,
+.timegrain-sand-bottom {
+  transition: all 0.4s ease-out;
+}
+
+/* Sand pile shapes */
+.timegrain-cone,
+.timegrain-pile {
+  transition: all 0.3s ease-out;
+}
+
+/* Shimmer animation - subtle shine moving across */
+.timegrain-shimmer {
+  animation: shimmer-move 3s ease-in-out infinite;
+  opacity: 0;
+}
+
+.timegrain-hourglass-active .timegrain-shimmer {
+  opacity: 1;
+}
+
+@keyframes shimmer-move {
+  0%, 100% { transform: translateX(-20px); opacity: 0; }
+  50% { transform: translateX(20px); opacity: 0.6; }
+}
+
+/* Surface grains subtle movement */
+.timegrain-surface-grain {
+  animation: grain-settle 2s ease-in-out infinite;
+}
+
+.timegrain-surface-grain:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+
+@keyframes grain-settle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(0.5px); }
+}
+
+/* Sand stream animation */
+.timegrain-sand-stream {
+  animation: stream-pulse 1.2s ease-in-out infinite;
+}
+
+.timegrain-stream-line {
+  animation: stream-flow 0.6s linear infinite;
+}
+
+@keyframes stream-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes stream-flow {
+  0% { stroke-dasharray: 0 20; stroke-dashoffset: 0; }
+  100% { stroke-dasharray: 4 20; stroke-dashoffset: -8; }
+}
+
+/* Falling particles - staggered cascade */
+.timegrain-particle-1 {
+  animation: particle-fall 0.7s ease-in infinite;
+}
+
+.timegrain-particle-2 {
+  animation: particle-fall 0.7s ease-in infinite 0.12s;
+}
+
+.timegrain-particle-3 {
+  animation: particle-fall 0.7s ease-in infinite 0.24s;
+}
+
+.timegrain-particle-4 {
+  animation: particle-fall 0.7s ease-in infinite 0.36s;
+}
+
+.timegrain-particle-5 {
+  animation: particle-fall 0.7s ease-in infinite 0.48s;
+}
+
+@keyframes particle-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
   }
-  50% {
-    box-shadow: 0 0 0 4px transparent;
+  20% {
+    opacity: 0.9;
   }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Idle sparkles - twinkling effect */
+.timegrain-sparkles {
+  opacity: 0.7;
+}
+
+.timegrain-sparkle-1 {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.timegrain-sparkle-2 {
+  animation: sparkle 2s ease-in-out infinite 0.8s;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 0.9; transform: scale(1.2); }
 }
 
 /* Current Task */
@@ -162,26 +317,110 @@
   cursor: default;
 }
 
+/* Simplified task name display during focus */
+.timegrain-task-name-display {
+  display: block;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  cursor: pointer;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.timegrain-task-name-display:hover {
+  opacity: 1;
+  color: var(--text-accent);
+}
+
 /* Time Display */
 .timegrain-time-display {
   text-align: center;
-  padding: var(--size-4-4);
+  padding: var(--size-4-3) var(--size-4-4);
+  transition: all 0.3s ease;
 }
 
-.timegrain-time {
-  font-size: 48px;
-  font-weight: var(--font-bold);
-  font-variant-numeric: tabular-nums;
+.timegrain-time-display.timegrain-running {
+  /* Warm ambient glow when running */
+  background: radial-gradient(ellipse at center, rgba(232, 196, 108, 0.08) 0%, transparent 70%);
+}
+
+.timegrain-time-display.timegrain-paused {
+  opacity: 0.6;
+}
+
+/* Timer digits container */
+.timegrain-digits {
+  display: inline-flex;
+  align-items: baseline;
   font-family: var(--font-monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-bold);
+  letter-spacing: -0.02em;
 }
 
-.timegrain-time.timegrain-paused {
-  opacity: 0.5;
-  animation: blink 1s infinite;
+/* Digit groups */
+.timegrain-digit-group {
+  font-size: 48px;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 0.5; }
+.timegrain-running .timegrain-digit-group {
+  color: var(--text-normal);
+  text-shadow: 0 0 20px rgba(232, 196, 108, 0.3);
+}
+
+/* Seconds slightly smaller and muted when not running */
+.timegrain-seconds {
+  font-size: 42px;
+  color: var(--text-muted);
+}
+
+.timegrain-running .timegrain-seconds {
+  color: var(--text-normal);
+  animation: secondsPulse 1s ease-in-out infinite;
+}
+
+@keyframes secondsPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+/* Colon styling */
+.timegrain-colon {
+  font-size: 40px;
+  color: var(--text-muted);
+  margin: 0 2px;
+  opacity: 0.6;
+}
+
+.timegrain-colon-pulse {
+  animation: colonBlink 1s ease-in-out infinite;
+  color: #e8c46c;
+  opacity: 1;
+}
+
+@keyframes colonBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Paused state blinks entire display */
+.timegrain-time-display.timegrain-paused .timegrain-digits {
+  animation: pausedBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes pausedBlink {
+  0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
 }
 
@@ -662,35 +901,13 @@
   flex-shrink: 0;
 }
 
-/* Progress Bar Fill */
+/* Progress Bar Fill - color set dynamically via inline style based on actual/estimate ratio */
 .timegrain-progress-fill {
   display: block;
   height: 100%;
   min-height: 4px;
   border-radius: 2px;
-  transition: width 0.3s ease;
-  background: var(--background-modifier-border-hover);
-}
-
-/* Progress fill colors based on status */
-.timegrain-task-button[data-status="today"] .timegrain-progress-fill {
-  background: var(--timegrain-success);
-}
-
-.timegrain-task-button[data-status="in progress"] .timegrain-progress-fill {
-  background: var(--timegrain-accent);
-}
-
-.timegrain-task-button[data-status="this week"] .timegrain-progress-fill {
-  background: var(--timegrain-info);
-}
-
-.timegrain-task-button[data-status="this month"] .timegrain-progress-fill {
-  background: var(--timegrain-purple);
-}
-
-.timegrain-task-button[data-status="backlog"] .timegrain-progress-fill {
-  background: var(--timegrain-warning);
+  transition: width 0.3s ease, background 0.3s ease;
 }
 
 /* Progress Text */

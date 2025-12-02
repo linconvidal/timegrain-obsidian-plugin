@@ -71,8 +71,8 @@ export interface TaskMetadataOptions {
 // Session Types
 // ============================================================================
 
-export type SessionAction = 'complete' | 'pause' | 'stop';
-export type SessionStatus = 'completed' | 'paused' | 'stopped' | 'abandoned';
+export type SessionAction = 'complete' | 'pause';
+export type SessionStatus = 'completed' | 'paused' | 'abandoned';
 
 /**
  * Feeling options (Garmin-style)
@@ -147,8 +147,7 @@ export interface TimerStatus {
   taskPath: string | null;
   sessionFilePath: string | null;
   startTime: number | null;
-  pausedAt: number | null;
-  totalPausedMs: number;
+  accumulatedMs: number;
   elapsedSeconds: number;
   currentPomodoro: number;
 }

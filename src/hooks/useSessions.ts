@@ -43,16 +43,16 @@ export function useSessions() {
     mountedRef.current = true;
     refresh();
 
-    // Refresh when timer completes, stops, or session is updated
+    // Refresh when timer completes, cancels, or session is updated
     const timerService = plugin.timerService;
     timerService.on('timer-complete', refresh);
-    timerService.on('timer-stop', refresh);
+    timerService.on('timer-cancel', refresh);
     timerService.on('session-updated', refresh);
 
     return () => {
       mountedRef.current = false;
       timerService.off('timer-complete', refresh);
-      timerService.off('timer-stop', refresh);
+      timerService.off('timer-cancel', refresh);
       timerService.off('session-updated', refresh);
     };
   }, [refresh, plugin.timerService]);

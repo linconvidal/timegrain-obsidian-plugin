@@ -5,11 +5,12 @@ import { useTimer } from '../hooks/useTimer';
 import { useSessions } from '../hooks/useSessions';
 import { useSettings } from '../hooks/useSettings';
 import { usePlugin } from '../context/PluginContext';
-import { formatSeconds, formatTimeOfDay, formatDurationHuman, extractTaskName } from '../utils/formatters';
+import { formatTimeOfDay, formatDurationHuman } from '../utils/formatters';
 import { GrainStack } from './GrainStack';
 import { ControlButtons } from './ControlButtons';
 import { TaskSelector } from './TaskSelector';
-import { GrainIcon } from './icons/GrainIcon';
+import { ActionBar } from './ActionBar';
+import { HourglassIcon } from './icons/GrainIcon';
 import type { Feeling } from '../types';
 
 const FEELING_EMOJIS: Record<Feeling, string> = {
@@ -24,16 +25,16 @@ const FEELING_EMOJIS: Record<Feeling, string> = {
  * Main timer display component for the sidebar view
  */
 export function TimerDisplay() {
-  const { status, isRunning, isPaused, isIdle, taskName, elapsedSeconds, currentPomodoro } = useTimer();
+  const { isRunning, isPaused, isIdle, taskName, taskPath, elapsedSeconds, currentPomodoro } = useTimer();
   const { todaySessions, todayPomodoros } = useSessions();
   const { settings } = useSettings();
   const { plugin, app } = usePlugin();
 
   const handleTaskClick = () => {
-    if (status.taskPath) {
-      const file = app.vault.getAbstractFileByPath(status.taskPath);
-      if (file) {
-        app.workspace.getLeaf().openFile(file as import('obsidian').TFile);
+    if (taskPath) {
+      const file = app.vault.getAbstractFileByPath(taskPath);
+      if (file instanceof TFile) {
+        app.workspace.getLeaf().openFile(file);
       }
     }
   };
@@ -43,12 +44,17 @@ export function TimerDisplay() {
       {/* Header */}
       <div className="timegrain-timer-header">
         <div className="timegrain-brand">
-          <GrainIcon size={24} className="timegrain-brand-icon" />
+          <HourglassIcon size={20} className="timegrain-brand-icon" />
           <h4>Timegrain</h4>
         </div>
-        <span className="timegrain-timer-subtitle">
-          {todayPomodoros} / {settings.dailyGoalPoms} grains today
-        </span>
+        <div className="timegrain-progress-dots">
+          {Array.from({ length: settings.dailyGoalPoms }, (_, i) => (
+            <span
+              key={i}
+              className={`timegrain-progress-dot ${i < todayPomodoros ? 'completed' : ''}`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Grain visualization */}
@@ -59,27 +65,9 @@ export function TimerDisplay() {
         isActive={isRunning}
       />
 
-      {/* Current task or task selector */}
-      {isIdle ? (
-        <TaskSelector />
-      ) : (
-        <div className="timegrain-current-task">
-          <span className="timegrain-label">Focused on</span>
-          <button
-            className="timegrain-task-link"
-            onClick={handleTaskClick}
-            disabled={!status.taskPath}
-          >
-            {taskName || 'Unknown task'}
-          </button>
-        </div>
-      )}
-
-      {/* Timer display */}
-      <div className="timegrain-time-display">
-        <span className={`timegrain-time ${isPaused ? 'timegrain-paused' : ''}`}>
-          {formatSeconds(elapsedSeconds, true)}
-        </span>
+      {/* Timer display - hero element */}
+      <div className={`timegrain-time-display ${isRunning ? 'timegrain-running' : ''} ${isPaused ? 'timegrain-paused' : ''}`}>
+        <TimerDigits seconds={elapsedSeconds} isRunning={isRunning} isPaused={isPaused} />
         {(isRunning || isPaused) && (
           <span className="timegrain-pomodoro-count">
             Grain {currentPomodoro}
@@ -90,12 +78,53 @@ export function TimerDisplay() {
       {/* Control buttons */}
       <ControlButtons />
 
+      {/* Current task or task selector */}
+      {isIdle ? (
+        <TaskSelector />
+      ) : (
+        <div className="timegrain-current-task">
+          <span
+            className="timegrain-task-name-display"
+            onClick={handleTaskClick}
+            title="Open task"
+          >
+            {taskName || 'Unknown task'}
+          </span>
+        </div>
+      )}
+
+      {/* Action bar - only when idle */}
+      {isIdle && <ActionBar />}
+
       {/* Recent sessions */}
       <RecentSessions
         sessions={todaySessions}
         app={app}
         plugin={plugin}
       />
+    </div>
+  );
+}
+
+/**
+ * Timer digits with animated colons and hierarchy
+ */
+function TimerDigits({ seconds, isRunning, isPaused }: { seconds: number; isRunning: boolean; isPaused: boolean }) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  const hh = String(hours).padStart(2, '0');
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(secs).padStart(2, '0');
+
+  return (
+    <div className="timegrain-digits">
+      <span className="timegrain-digit-group timegrain-hours">{hh}</span>
+      <span className={`timegrain-colon ${isRunning ? 'timegrain-colon-pulse' : ''}`}>:</span>
+      <span className="timegrain-digit-group timegrain-minutes">{mm}</span>
+      <span className={`timegrain-colon ${isRunning ? 'timegrain-colon-pulse' : ''}`}>:</span>
+      <span className="timegrain-digit-group timegrain-seconds">{ss}</span>
     </div>
   );
 }
