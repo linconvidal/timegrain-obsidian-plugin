@@ -48,10 +48,10 @@ export function TimerDisplay() {
           <h4>Timegrain</h4>
         </div>
         <div className="timegrain-progress-dots">
-          {Array.from({ length: settings.dailyGoalPoms }, (_, i) => (
+          {Array.from({ length: Math.max(settings.dailyGoalPoms, todayPomodoros) }, (_, i) => (
             <span
               key={i}
-              className={`timegrain-progress-dot ${i < todayPomodoros ? 'completed' : ''}`}
+              className={`timegrain-progress-dot ${i < todayPomodoros ? 'completed' : ''} ${i >= settings.dailyGoalPoms ? 'bonus' : ''}`}
             />
           ))}
         </div>

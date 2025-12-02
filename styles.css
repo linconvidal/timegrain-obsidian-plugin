@@ -74,6 +74,17 @@
   box-shadow: 0 0 4px rgba(212, 168, 85, 0.4);
 }
 
+.timegrain-progress-dot.bonus {
+  background: linear-gradient(135deg, #ff9500, #ff6b00);
+  box-shadow: 0 0 6px rgba(255, 107, 0, 0.7);
+  animation: bonusPulse 2s ease-in-out infinite;
+}
+
+@keyframes bonusPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 107, 0, 0.7); }
+  50% { box-shadow: 0 0 10px rgba(255, 107, 0, 1); }
+}
+
 /* Hourglass Visualization */
 .timegrain-grain-stack {
   display: flex;
@@ -159,6 +170,14 @@
 
 .timegrain-hourglass-active {
   filter: drop-shadow(0 2px 8px rgba(212, 168, 85, 0.25));
+}
+
+.timegrain-hourglass-overflow {
+  filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.5));
+}
+
+.timegrain-hourglass-overflow.timegrain-hourglass-active {
+  filter: drop-shadow(0 0 14px rgba(255, 107, 0, 0.6));
 }
 
 .timegrain-glass-outline {

@@ -13,6 +13,7 @@ export function GrainStack({ completedGrains, goalGrains, currentProgress, isAct
   const currentGrainContribution = isActive ? currentProgress : 0;
   const totalProgress = (completedGrains + currentGrainContribution) / goalGrains;
   const fillPercent = Math.min(totalProgress, 1);
+  const isOverflow = completedGrains >= goalGrains;
 
   // Hourglass dimensions
   const width = 56;
@@ -95,7 +96,7 @@ export function GrainStack({ completedGrains, goalGrains, currentProgress, isAct
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
-        className={`timegrain-hourglass ${isActive ? 'timegrain-hourglass-active' : ''}`}
+        className={`timegrain-hourglass ${isActive ? 'timegrain-hourglass-active' : ''} ${isOverflow ? 'timegrain-hourglass-overflow' : ''}`}
         role="progressbar"
         aria-valuenow={completedGrains}
         aria-valuemax={goalGrains}
