@@ -154,3 +154,177 @@ describe('Filename collision safeguard', () => {
     expect(maxAttempts).toBe(1000);
   });
 });
+
+/**
+ * Parse comma-separated tags input
+ * Extracted from NewTaskModal.parseTagsInput
+ */
+function parseTagsInput(value: string): string[] {
+  if (!value.trim()) return [];
+  const parts = value
+    .split(',')
+    .map((tag) => tag.trim().replace(/^#/, ''))
+    .filter(Boolean);
+  return Array.from(new Set(parts));
+}
+
+describe('parseTagsInput', () => {
+  it('should parse comma-separated tags', () => {
+    expect(parseTagsInput('urgent, review, backend')).toEqual(['urgent', 'review', 'backend']);
+  });
+
+  it('should handle single tag', () => {
+    expect(parseTagsInput('urgent')).toEqual(['urgent']);
+  });
+
+  it('should trim whitespace from tags', () => {
+    expect(parseTagsInput('  urgent  ,  review  ')).toEqual(['urgent', 'review']);
+  });
+
+  it('should strip hash prefix from tags', () => {
+    expect(parseTagsInput('#urgent, #review')).toEqual(['urgent', 'review']);
+    expect(parseTagsInput('#urgent, review, #backend')).toEqual(['urgent', 'review', 'backend']);
+  });
+
+  it('should deduplicate tags', () => {
+    expect(parseTagsInput('urgent, review, urgent')).toEqual(['urgent', 'review']);
+    expect(parseTagsInput('#urgent, urgent')).toEqual(['urgent']);
+  });
+
+  it('should return empty array for empty input', () => {
+    expect(parseTagsInput('')).toEqual([]);
+    expect(parseTagsInput('   ')).toEqual([]);
+  });
+
+  it('should filter out empty tags from multiple commas', () => {
+    expect(parseTagsInput('urgent,,review')).toEqual(['urgent', 'review']);
+    expect(parseTagsInput(',urgent,review,')).toEqual(['urgent', 'review']);
+  });
+});
+
+/**
+ * Frequency-sorted metadata options
+ * Extracted from TaskRepository.getMetadataOptions logic
+ */
+function addOptionWithCount(target: Map<string, { value: string; count: number }>, value: string | undefined): void {
+  const trimmed = value?.trim();
+  if (!trimmed) return;
+  const key = trimmed.toLowerCase();
+  const existing = target.get(key);
+  if (existing) {
+    existing.count++;
+  } else {
+    target.set(key, { value: trimmed, count: 1 });
+  }
+}
+
+function toFrequencySortedValues(map: Map<string, { value: string; count: number }>): string[] {
+  return Array.from(map.values())
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value))
+    .map((item) => item.value);
+}
+
+describe('Metadata frequency sorting', () => {
+  describe('addOptionWithCount', () => {
+    it('should add new options with count 1', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      addOptionWithCount(map, 'work');
+      expect(map.get('work')).toEqual({ value: 'work', count: 1 });
+    });
+
+    it('should increment count for existing options', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      addOptionWithCount(map, 'work');
+      addOptionWithCount(map, 'work');
+      addOptionWithCount(map, 'work');
+      expect(map.get('work')).toEqual({ value: 'work', count: 3 });
+    });
+
+    it('should be case-insensitive for matching', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      addOptionWithCount(map, 'Work');
+      addOptionWithCount(map, 'work');
+      addOptionWithCount(map, 'WORK');
+      // Should preserve first casing but count all
+      expect(map.get('work')).toEqual({ value: 'Work', count: 3 });
+    });
+
+    it('should ignore empty/null/undefined values', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      addOptionWithCount(map, '');
+      addOptionWithCount(map, '   ');
+      addOptionWithCount(map, undefined);
+      expect(map.size).toBe(0);
+    });
+
+    it('should trim whitespace', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      addOptionWithCount(map, '  work  ');
+      expect(map.get('work')).toEqual({ value: 'work', count: 1 });
+    });
+  });
+
+  describe('toFrequencySortedValues', () => {
+    it('should sort by frequency descending', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      map.set('work', { value: 'work', count: 5 });
+      map.set('personal', { value: 'personal', count: 10 });
+      map.set('hobby', { value: 'hobby', count: 2 });
+
+      expect(toFrequencySortedValues(map)).toEqual(['personal', 'work', 'hobby']);
+    });
+
+    it('should use alphabetical order as tiebreaker', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      map.set('zebra', { value: 'zebra', count: 3 });
+      map.set('apple', { value: 'apple', count: 3 });
+      map.set('mango', { value: 'mango', count: 3 });
+
+      expect(toFrequencySortedValues(map)).toEqual(['apple', 'mango', 'zebra']);
+    });
+
+    it('should handle mixed frequencies with tiebreakers', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      map.set('work', { value: 'work', count: 5 });
+      map.set('personal', { value: 'personal', count: 5 });
+      map.set('hobby', { value: 'hobby', count: 2 });
+      map.set('admin', { value: 'admin', count: 2 });
+
+      // First by frequency (5, 5, 2, 2), then alphabetically within same frequency
+      expect(toFrequencySortedValues(map)).toEqual(['personal', 'work', 'admin', 'hobby']);
+    });
+
+    it('should return empty array for empty map', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      expect(toFrequencySortedValues(map)).toEqual([]);
+    });
+
+    it('should handle single item', () => {
+      const map = new Map<string, { value: string; count: number }>();
+      map.set('work', { value: 'work', count: 1 });
+      expect(toFrequencySortedValues(map)).toEqual(['work']);
+    });
+  });
+
+  describe('integration: full metadata collection', () => {
+    it('should return most frequently used options first', () => {
+      const categories = new Map<string, { value: string; count: number }>();
+
+      // Simulate tasks with categories
+      // 🐞 debug appears 3 times
+      addOptionWithCount(categories, '🐞 debug');
+      addOptionWithCount(categories, '🐞 debug');
+      addOptionWithCount(categories, '🐞 debug');
+      // 📝 documentation appears 1 time
+      addOptionWithCount(categories, '📝 documentation');
+      // 🚀 feature appears 2 times
+      addOptionWithCount(categories, '🚀 feature');
+      addOptionWithCount(categories, '🚀 feature');
+
+      const sorted = toFrequencySortedValues(categories);
+      expect(sorted[0]).toBe('🐞 debug'); // Most frequent
+      expect(sorted[1]).toBe('🚀 feature'); // Second most
+      expect(sorted[2]).toBe('📝 documentation'); // Least frequent
+    });
+  });
+});

@@ -77,6 +77,8 @@ function createTask(
     actualPoms: number;
     area: string;
     category: string;
+    scope: string;
+    tags: string[];
     modificationDate: number;
   }> = {}
 ): Task {
@@ -90,6 +92,8 @@ function createTask(
     expectedEnergy: 3,
     area: opts.area ?? 'test',
     category: opts.category ?? '',
+    scope: opts.scope ?? '',
+    tags: opts.tags ?? [],
     modificationDate: opts.modificationDate ?? Date.now(),
     file: {} as Task['file'],
   };

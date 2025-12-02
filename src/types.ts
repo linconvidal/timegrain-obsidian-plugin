@@ -29,14 +29,14 @@ export interface TaskFrontmatter {
   'expected energy'?: number;
   expected_energy?: number;
   category?: string;
+  scope?: string;
   'creation date'?: string;
   creation_date?: string;
   'modification date'?: string;
   modification_date?: string;
   'due to'?: string;
   due_to?: string;
-  scope?: string;
-  tags?: string[];
+  tags?: string | string[];
   'depends on'?: string;
   depends_on?: string;
   goal?: string;
@@ -55,8 +55,16 @@ export interface Task {
   expectedEnergy: number;
   area: string;
   category: string;
+  scope: string;
+  tags: string[];
   modificationDate: number;
   file: TFile;
+}
+
+export interface TaskMetadataOptions {
+  categories: string[];
+  scopes: string[];
+  tags: string[];
 }
 
 // ============================================================================

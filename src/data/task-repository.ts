@@ -1,5 +1,5 @@
-import { App, TFile, TFolder, Events } from 'obsidian';
-import type { Task, TaskFrontmatter, TaskStatus, TimegrainSettings } from '../types';
+import { App, TFile, Events } from 'obsidian';
+import type { Task, TaskFrontmatter, TaskMetadataOptions, TaskStatus, TimegrainSettings } from '../types';
 import { readFrontmatter, updateFrontmatter, safeInt, safeString } from './frontmatter';
 import { formatDateOnly } from '../utils/datetime';
 
@@ -150,6 +150,9 @@ export class TaskRepository extends Events {
     const expectedEnergy = frontmatter.expected_energy != null
       ? safeInt(frontmatter.expected_energy)
       : safeInt(frontmatter['expected energy'], 0);
+    const category = safeString(frontmatter.category).trim();
+    const scope = safeString(frontmatter.scope).trim();
+    const tags = this.normalizeTags(frontmatter.tags);
 
     return {
       path: file.path,
@@ -160,7 +163,9 @@ export class TaskRepository extends Events {
       actualPoms: 0, // Will be computed from sessions
       expectedEnergy,
       area: this.extractAreaFromPath(file.path),
-      category: safeString(frontmatter.category),
+      category,
+      scope,
+      tags,
       modificationDate: file.stat.mtime,
       file,
     };
@@ -236,6 +241,69 @@ export class TaskRepository extends Events {
         }
       })
     );
+  }
+
+  /**
+   * Get unique metadata options for categories/scopes/tags from existing tasks
+   * Returns options sorted by frequency (most used first)
+   */
+  getMetadataOptions(): TaskMetadataOptions {
+    const categories = new Map<string, { value: string; count: number }>();
+    const scopes = new Map<string, { value: string; count: number }>();
+    const tags = new Map<string, { value: string; count: number }>();
+
+    for (const task of this.tasks.values()) {
+      this.addOptionWithCount(categories, task.category);
+      this.addOptionWithCount(scopes, task.scope);
+      (task.tags || []).forEach((tag) => this.addOptionWithCount(tags, tag));
+    }
+
+    return {
+      categories: this.toFrequencySortedValues(categories),
+      scopes: this.toFrequencySortedValues(scopes),
+      tags: this.toFrequencySortedValues(tags),
+    };
+  }
+
+  private addOptionWithCount(target: Map<string, { value: string; count: number }>, value: string): void {
+    const trimmed = value?.trim();
+    if (!trimmed) return;
+    const key = trimmed.toLowerCase();
+    const existing = target.get(key);
+    if (existing) {
+      existing.count++;
+    } else {
+      target.set(key, { value: trimmed, count: 1 });
+    }
+  }
+
+  private toFrequencySortedValues(map: Map<string, { value: string; count: number }>): string[] {
+    return Array.from(map.values())
+      .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value))
+      .map((item) => item.value);
+  }
+
+  private normalizeTags(rawTags: unknown): string[] {
+    if (!rawTags) return [];
+
+    const values = Array.isArray(rawTags) ? rawTags : [rawTags];
+    const tagSet = new Set<string>();
+
+    for (const raw of values) {
+      const text = safeString(raw).trim();
+      if (!text) continue;
+
+      const parts = text
+        .split(/[, ]+/)
+        .map((part) => part.replace(/^#/, '').trim())
+        .filter(Boolean);
+
+      for (const part of parts) {
+        tagSet.add(part);
+      }
+    }
+
+    return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
   }
 
   /**

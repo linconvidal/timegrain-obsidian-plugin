@@ -1,4 +1,4 @@
-import { App, Modal, Setting, Notice } from 'obsidian';
+import { App, Modal, Setting, Notice, type TextComponent } from 'obsidian';
 import type TimegrainPlugin from '../main';
 import type { TaskStatus } from '../types';
 import { formatTaskDateTime } from '../utils/datetime';
@@ -30,6 +30,8 @@ export class NewTaskModal extends Modal {
   private category = '';
   private taskScope = '';
   private tags = '';
+  private metadataOptions = { categories: [] as string[], scopes: [] as string[], tags: [] as string[] };
+  private datalistIdCounter = 0;
 
   constructor(
     app: App,
@@ -42,6 +44,7 @@ export class NewTaskModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass('timegrain-new-task-modal');
+    this.refreshMetadataOptions();
 
     contentEl.createEl('h2', { text: 'Create New Task' });
 
@@ -113,7 +116,7 @@ export class NewTaskModal extends Modal {
     // Category
     new Setting(contentEl)
       .setName('Category')
-      .setDesc('Optional category for organization')
+      .setDesc('Type to see suggestions from your vault')
       .addText((text) => {
         text
           .setPlaceholder('e.g., 🐞 debug / test, 📝 documentation')
@@ -121,12 +124,13 @@ export class NewTaskModal extends Modal {
           .onChange((value) => {
             this.category = value;
           });
+        this.attachAutocomplete(text, this.metadataOptions.categories);
       });
 
     // Scope
     new Setting(contentEl)
       .setName('Scope')
-      .setDesc('Project or area this task belongs to')
+      .setDesc('Type to see suggestions from your vault')
       .addText((text) => {
         text
           .setPlaceholder('e.g., 🔑 Project Name')
@@ -134,12 +138,13 @@ export class NewTaskModal extends Modal {
           .onChange((value) => {
             this.taskScope = value;
           });
+        this.attachAutocomplete(text, this.metadataOptions.scopes);
       });
 
     // Tags
     new Setting(contentEl)
       .setName('Tags')
-      .setDesc('Comma-separated tags for filtering')
+      .setDesc('Comma-separated, type to see suggestions')
       .addText((text) => {
         text
           .setPlaceholder('e.g., urgent, review, backend')
@@ -147,6 +152,7 @@ export class NewTaskModal extends Modal {
           .onChange((value) => {
             this.tags = value;
           });
+        this.attachAutocomplete(text, this.metadataOptions.tags);
       });
 
     // Buttons
@@ -163,6 +169,32 @@ export class NewTaskModal extends Modal {
       cls: 'timegrain-btn timegrain-btn-primary',
     });
     createBtn.addEventListener('click', () => this.createTask());
+  }
+
+  private refreshMetadataOptions(): void {
+    this.metadataOptions = this.plugin.taskRepository.getMetadataOptions();
+  }
+
+  private attachAutocomplete(text: TextComponent, options: string[]): void {
+    if (options.length === 0) return;
+
+    const datalistId = `timegrain-meta-${this.datalistIdCounter++}`;
+    const datalist = this.contentEl.createEl('datalist', { attr: { id: datalistId } });
+
+    options.forEach((option) => {
+      datalist.createEl('option', { attr: { value: option } });
+    });
+
+    text.inputEl.setAttribute('list', datalistId);
+  }
+
+  private parseTagsInput(value: string): string[] {
+    if (!value.trim()) return [];
+    const parts = value
+      .split(',')
+      .map((tag) => tag.trim().replace(/^#/, ''))
+      .filter(Boolean);
+    return Array.from(new Set(parts));
   }
 
   private async createTask(): Promise<void> {
@@ -213,9 +245,13 @@ export class NewTaskModal extends Modal {
         return;
       }
 
+      const category = this.category.trim();
+      const scope = this.taskScope.trim();
+      const tags = this.parseTagsInput(this.tags);
+
       // Build frontmatter matching flowtime format
       const frontmatter: Record<string, unknown> = {
-        category: this.category.trim() || null,
+        category: category || null,
         'creation date': formatTaskDateTime(now),
         'depends on': null,
         'due to': null,
@@ -223,11 +259,9 @@ export class NewTaskModal extends Modal {
         'expected energy': this.expectedEnergy > 0 ? this.expectedEnergy : null,
         goal: [],
         'modification date': formatTaskDateTime(now),
-        scope: this.taskScope.trim() || null,
+        scope: scope || null,
         status: this.status,
-        tags: this.tags.trim()
-          ? this.tags.split(',').map((t) => t.trim()).filter((t) => t)
-          : [],
+        tags,
       };
 
       // Build content with proper YAML escaping
