@@ -659,6 +659,12 @@
   }
 }
 
+/* Task List Container */
+.timegrain-task-list {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Task List Header */
 .timegrain-task-list h5 {
   margin: 0;
@@ -702,7 +708,8 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 280px;
+  min-height: 130px; /* Space for ~2 task cards */
+  max-height: 400px; /* Scroll when many tasks */
   overflow-y: auto;
   display: flex;
   flex-direction: column;

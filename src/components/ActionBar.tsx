@@ -11,19 +11,19 @@ export function ActionBar() {
     <div className="timegrain-action-bar">
       <button
         className="timegrain-action-btn"
-        onClick={() => plugin.openTaskSuggester()}
-        title="Search all tasks"
-      >
-        <SearchIcon />
-        <span className="timegrain-action-label">Search</span>
-      </button>
-      <button
-        className="timegrain-action-btn"
         onClick={() => plugin.openNewTaskModal()}
         title="Create new task"
       >
         <PlusIcon />
         <span className="timegrain-action-label">New</span>
+      </button>
+      <button
+        className="timegrain-action-btn"
+        onClick={() => plugin.openTaskSuggester()}
+        title="Search all tasks"
+      >
+        <SearchIcon />
+        <span className="timegrain-action-label">Search</span>
       </button>
       <button
         className="timegrain-action-btn"
