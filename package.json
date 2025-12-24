@@ -11,8 +11,12 @@
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": ["obsidian", "pomodoro", "timer", "productivity", "task-management"],
-	"author": "",
+	"author": "Lincon Vidal",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/linconvidal/timegrain-obsidian-plugin"
+	},
 	"dependencies": {
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0"

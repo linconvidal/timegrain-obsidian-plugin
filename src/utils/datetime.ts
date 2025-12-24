@@ -2,7 +2,6 @@ import { DAY_NAMES, type DayName } from '../constants';
 
 /**
  * Parse datetime from various string formats
- * Matches flowtime's parse_datetime() for compatibility
  *
  * Supported formats:
  * - ISO 8601: "2025-01-15T14:30:00"
@@ -72,7 +71,6 @@ export function parseDateTime(input: unknown): Date {
 
 /**
  * Format datetime to ISO 8601 string (without milliseconds and timezone)
- * Matches flowtime's strftime("%Y-%m-%dT%H:%M:%S")
  */
 export function formatDateTimeISO(date: Date): string {
   const year = date.getFullYear();
@@ -96,7 +94,6 @@ export function formatDateOnly(date: Date): string {
 
 /**
  * Format datetime for task frontmatter (YYYY-MM-DD HH:MM)
- * Matches flowtime's task date format (no seconds)
  */
 export function formatTaskDateTime(date: Date): string {
   const year = date.getFullYear();
@@ -109,7 +106,6 @@ export function formatTaskDateTime(date: Date): string {
 
 /**
  * Format session filename (YYYYMMDD-HHMM)
- * Matches flowtime's session filename format for compatibility
  */
 export function formatSessionFilename(date: Date): string {
   const year = date.getFullYear();

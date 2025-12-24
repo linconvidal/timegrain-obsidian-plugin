@@ -26,8 +26,6 @@ export default class TimegrainPlugin extends Plugin {
   private statusBarItem: HTMLElement | null = null;
 
   async onload(): Promise<void> {
-    console.log('Loading Timegrain plugin');
-
     // Load settings
     await this.loadSettings();
 
@@ -97,8 +95,6 @@ export default class TimegrainPlugin extends Plugin {
   }
 
   async onunload(): Promise<void> {
-    console.log('Unloading Timegrain plugin');
-
     // Save timer state before unloading
     await this.saveTimerState();
 

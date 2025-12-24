@@ -69,7 +69,7 @@ describe('datetime utilities', () => {
   });
 
   describe('formatSessionFilename', () => {
-    it('should create filename from date in YYYYMMDD-HHMM format (flowtime compatible)', () => {
+    it('should create filename from date in YYYYMMDD-HHMM format', () => {
       const date = new Date(2024, 2, 15, 10, 30, 45);
       const result = formatSessionFilename(date);
       expect(result).toBe('20240315-1030');
@@ -81,8 +81,7 @@ describe('datetime utilities', () => {
       expect(result).toBe('20240105-0805');
     });
 
-    it('should match flowtime session filename format', () => {
-      // Flowtime uses YYYYMMDD-HHMM format without seconds
+    it('should use YYYYMMDD-HHMM format without seconds', () => {
       const date = new Date(2024, 2, 15, 10, 30, 0);
       expect(formatSessionFilename(date)).toBe('20240315-1030');
     });

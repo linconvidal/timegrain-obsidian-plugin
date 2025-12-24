@@ -264,7 +264,7 @@ export class NewTaskModal extends Modal {
       const scope = this.taskScope.trim();
       const tags = this.parseTagsInput(this.tags);
 
-      // Build frontmatter matching flowtime format
+      // Build frontmatter
       const frontmatter: Record<string, unknown> = {
         category: category || null,
         'creation date': formatTaskDateTime(now),

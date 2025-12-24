@@ -37,8 +37,7 @@ export async function readFrontmatter<T extends Record<string, unknown>>(
 
 /**
  * Normalize frontmatter keys to handle space/underscore variations
- * flowtime uses spaces in YAML (e.g., "expected energy"),
- * but we also support underscores
+ * Supports both spaces in YAML (e.g., "expected energy") and underscores
  */
 function normalizeFrontmatterKeys<T extends Record<string, unknown>>(frontmatter: T): T {
   const normalized = { ...frontmatter };

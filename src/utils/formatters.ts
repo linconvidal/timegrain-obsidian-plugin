@@ -148,7 +148,6 @@ export function capitalize(str: string): string {
 
 /**
  * Slugify text for filesystem-safe filenames
- * Matches flowtime's slugify()
  */
 export function slugify(text: string): string {
   if (!text || !text.trim()) {

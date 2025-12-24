@@ -18,8 +18,8 @@ export type TaskStatus =
   | 'needs review';
 
 /**
- * Task frontmatter structure matching flowtime format
- * Keys with spaces are for flowtime compatibility
+ * Task frontmatter structure
+ * Keys with spaces supported for YAML readability
  */
 export interface TaskFrontmatter {
   [key: string]: unknown;
@@ -80,7 +80,7 @@ export type SessionStatus = 'completed' | 'paused' | 'abandoned';
 export type Feeling = 'very_weak' | 'weak' | 'normal' | 'strong' | 'very_strong';
 
 /**
- * Session frontmatter structure matching flowtime format
+ * Session frontmatter structure
  */
 export interface SessionFrontmatter {
   [key: string]: unknown;

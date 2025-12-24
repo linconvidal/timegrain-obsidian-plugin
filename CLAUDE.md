@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Timegrain** is an Obsidian plugin that recreates the Python [flowtime](~/code/flowtime) TUI application. It provides a Pomodoro timer with task tracking, energy logging, and productivity analytics.
+**Timegrain** is an Obsidian plugin that provides a Pomodoro timer with task tracking, energy logging, and productivity analytics.
 
 Philosophy: *"Harvest your time, grain by grain"*
 
@@ -82,7 +82,7 @@ styles.css                     # Plugin styles
 
 ## Data Format
 
-Compatible with flowtime's YAML frontmatter format:
+Data stored as YAML frontmatter:
 
 **Tasks** (`*/tasks/*.md`):
 ```yaml
@@ -142,9 +142,7 @@ Plugin files deployed to vault:
 - `manifest.json` - Plugin metadata
 - `styles.css` - CSS styles
 
-Vault location: `/mnt/c/Users/Linco/Documents/dev_vault/.obsidian/plugins/timegrain/`
-
-Run `./deploy.sh` to build and copy files to the vault.
+Run `./deploy.sh` to build and copy files to your vault.
 
 ## Testing
 
@@ -154,7 +152,7 @@ Tests use Vitest with mocked Obsidian API:
 
 Run `npm test` to execute all tests.
 
-## Feature Parity
+## Features
 
-See `FEATURES.md` for detailed comparison with Python flowtime.
+See `FEATURES.md` for detailed feature checklist.
 Current coverage: **92.5%** (74/80 features)

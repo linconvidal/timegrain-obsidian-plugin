@@ -1,6 +1,6 @@
-# Timegrain Feature Parity Checklist
+# Timegrain Feature Checklist
 
-Comparison between Python Flowtime TUI and Timegrain Obsidian Plugin.
+Feature implementation status for Timegrain Obsidian Plugin.
 
 ## Summary
 
